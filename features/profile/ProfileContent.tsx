@@ -70,7 +70,7 @@ const ProfileContent = ({ id }: { id?: number }) => {
    refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
    }
-   contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
+   contentContainerStyle={{ padding: 5, paddingBottom: 60 }}
    ListFooterComponent={() => (
     <View>
      {refreshing && (
