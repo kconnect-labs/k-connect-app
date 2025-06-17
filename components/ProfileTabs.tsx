@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
- View,
- TouchableOpacity,
- Text,
- StyleSheet,
- Animated,
+    Animated,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { ProfileTabKey, profileTabs } from "types/tabs";
 
@@ -108,8 +108,8 @@ const styles = StyleSheet.create({
  },
  tab: {
   flex: 1,
-  paddingVertical: 12,
-  paddingHorizontal: 16,
+  paddingVertical: 10,
+  paddingHorizontal: 12,
   alignItems: "center",
   justifyContent: "center",
  },
@@ -119,10 +119,12 @@ const styles = StyleSheet.create({
  },
  text: {
   color: "#999",
+  fontSize: 12,
  },
  activeText: {
   color: "#fff",
-  fontWeight: "bold",
+  fontWeight: "600",
+  fontSize: 12,
  },
  indicator: {
   position: "absolute",
@@ -133,4 +135,5 @@ const styles = StyleSheet.create({
  },
 });
 
-export { ProfileTabs, ProfileContent };
+export { ProfileContent, ProfileTabs };
+

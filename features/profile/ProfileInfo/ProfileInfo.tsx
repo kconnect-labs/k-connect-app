@@ -1,12 +1,12 @@
-import { View } from "react-native";
-import { Root } from "types/profile";
-import { Flex } from "@ui/Flex";
-import { Icon } from "react-native-paper";
-import TextC from "@ui/TextC";
 import Badge from "@ui/Badge";
+import { Flex } from "@ui/Flex";
+import TextC from "@ui/TextC";
 import { useMemo } from "react";
+import { View } from "react-native";
 import { Pressable } from "react-native-gesture-handler";
+import { Icon } from "react-native-paper";
 import { useModalStore } from "stores/modalStore";
+import { Root } from "types/profile";
 import ModalHistoryUsername from "./components/ModalHistoryUsername";
 
 const ProfileInfo = ({ data }: { data: Root | null }) => {
@@ -24,7 +24,7 @@ const ProfileInfo = ({ data }: { data: Root | null }) => {
      onPress={() => openModal(<ModalHistoryUsername data={username} />, "")}
     >
      <Badge key={username.id} color={color.badge}>
-      <TextC color={color.text} size={12}>
+      <TextC color={color.text} size={11}>
        @{username.username}
       </TextC>
      </Badge>
@@ -32,25 +32,27 @@ const ProfileInfo = ({ data }: { data: Root | null }) => {
    );
   });
  }, [data?.user?.purchased_usernames]);
+
  return (
   <Flex
    direction="column"
-   gap={20}
-   className="bg-[#1e1f20] rounded-xl w-full p-4"
+   gap={16}
+   className="bg-[#1e1f20] rounded-xl w-full p-3"
+   style={{ maxWidth: '100%', overflow: 'hidden' }}
   >
    <Flex direction="row" align="flex-start" gap={6}>
-    <Icon source={"information"} size={24} color="#d0bcff" />
-    <Flex direction="column" gap={6} flex={1}>
-     <TextC color="#ffffff80">Обо мне</TextC>
-     {data?.user.about && <TextC>{data?.user.about}</TextC>}
+    <Icon source={"information"} size={22} color="#d0bcff" />
+    <Flex direction="column" gap={4} flex={1}>
+     <TextC color="#ffffff80" size={12}>Обо мне</TextC>
+     {data?.user.about && <TextC size={13}>{data?.user.about}</TextC>}
     </Flex>
    </Flex>
    <View className="w-full h-0.5 bg-[#292a2b]" />
    <Flex direction="row" align="flex-start" gap={6}>
-    <Icon source={"calendar"} size={24} color="#d0bcff" />
-    <Flex direction="column" gap={6} flex={1}>
-     <TextC color="#ffffff80">Дата регистрации</TextC>
-     <TextC>
+    <Icon source={"calendar"} size={22} color="#d0bcff" />
+    <Flex direction="column" gap={4} flex={1}>
+     <TextC color="#ffffff80" size={12}>Дата регистрации</TextC>
+     <TextC size={13}>
       {new Date(data?.user.registration_date || 0).toLocaleString("ru-RU", {
        day: "numeric",
        month: "long",
@@ -60,10 +62,10 @@ const ProfileInfo = ({ data }: { data: Root | null }) => {
     </Flex>
    </Flex>
    <Flex direction="row" align="flex-start" gap={6}>
-    <Icon source={"at"} size={24} color="#d0bcff" />
-    <Flex direction="column" gap={6} flex={1}>
-     <TextC color="#ffffff80">Юзернеймы</TextC>
-     <Flex direction="row" className="flex-wrap" gap={4}>
+    <Icon source={"at"} size={22} color="#d0bcff" />
+    <Flex direction="column" gap={4} flex={1}>
+     <TextC color="#ffffff80" size={12}>Юзернеймы</TextC>
+     <Flex direction="row" className="flex-wrap" gap={3}>
       {renderedUsernames}
      </Flex>
     </Flex>

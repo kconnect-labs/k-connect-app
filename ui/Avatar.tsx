@@ -1,14 +1,12 @@
+import { router } from "expo-router";
+import { FC } from "react";
 import {
- View,
- Text,
- Image,
- ImageSourcePropType,
- Pressable,
+  Image,
+  ImageSourcePropType,
+  Pressable
 } from "react-native";
 import { Flex } from "./Flex";
-import { FC } from "react";
 import TextC from "./TextC";
-import { router } from "expo-router";
 
 export type Props = {
  image?: ImageSourcePropType;

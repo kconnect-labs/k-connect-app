@@ -40,10 +40,10 @@ const ProfileSubInfo = React.memo(({ data }: { data: Root | null }) => {
    </Flex>
    <Flex direction="column" gap={4} className="w-1/2">
     <TextC weight="bold" className="opacity-75 w-full">
-     Подпикси
+     Подписки
     </TextC>
     <Flex gap={4} align="center">
-     {dataFollowing?.following
+     {dataFollowing?.following 
       .slice(0, 3)
       .map((follower: { id: number; avatar_url: string }) => (
        <Avatar

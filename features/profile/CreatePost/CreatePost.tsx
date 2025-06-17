@@ -1,9 +1,9 @@
-import { Flex } from "@ui/Flex";
-import Avatar from "@ui/Avatar";
-import { Button } from "react-native-paper";
-import { TextInput, View } from "react-native";
 import { useCreatePost } from "@hooks/useCreatePost";
+import Avatar from "@ui/Avatar";
+import { Flex } from "@ui/Flex";
 import { useState } from "react";
+import { TextInput, View } from "react-native";
+import { Button } from "react-native-paper";
 import useAuthStore from "stores/useAuthStore";
 
 const CreatePost = () => {
@@ -25,7 +25,7 @@ const CreatePost = () => {
     <Avatar
      userId={user.id}
      size={20}
-     image={{ uri: `https://k-connect.ru${user.photo}` }}
+     image={{ uri: `https://k-connect.ru${user.avatar_url}` }}
     />
     <View className="flex-1">
      <TextInput

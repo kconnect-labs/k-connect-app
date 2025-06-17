@@ -1,14 +1,14 @@
-import { View, RefreshControl } from "react-native";
-import { ProfileBlock } from "./ProfileBlock/ProfileBlock";
-import ProfilePosts from "./ProfilePosts/ProfilePosts";
 import { usePosts } from "@hooks/usePosts";
 import { useProfile } from "@hooks/useProfile";
-import React, { useCallback, useMemo, useState } from "react";
-import { ProfileTabKey } from "types/tabs";
 import { ProfileTabs } from "components/ProfileTabs";
+import React, { useCallback, useMemo, useState } from "react";
+import { RefreshControl, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { ActivityIndicator } from "react-native-paper";
+import { ProfileTabKey } from "types/tabs";
+import { ProfileBlock } from "./ProfileBlock/ProfileBlock";
 import ProfileInfo from "./ProfileInfo/ProfileInfo";
+import ProfilePosts from "./ProfilePosts/ProfilePosts";
 
 const MemoizedProfilePosts = React.memo(ProfilePosts);
 
@@ -70,7 +70,12 @@ const ProfileContent = ({ id }: { id?: number }) => {
    refreshControl={
     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
    }
-   contentContainerStyle={{ padding: 5, paddingBottom: 60 }}
+   contentContainerStyle={{ 
+    padding: 8,
+    paddingBottom: 60,
+    maxWidth: '100%',
+    overflow: 'hidden'
+   }}
    ListFooterComponent={() => (
     <View>
      {refreshing && (
