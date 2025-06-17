@@ -1,9 +1,9 @@
-import { SVG_HOME, SVG_PROFILE, SVG_SHARE_NODES } from "../../assets/svg/svg";
+import { SVG_HOME, SVG_PROFILE, SVG_SHARE_NODES } from "assets/svg/svg";
 import { Tabs } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import "../../global.css";
 import { PaperProvider } from "react-native-paper";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabLayout() {
  return (
