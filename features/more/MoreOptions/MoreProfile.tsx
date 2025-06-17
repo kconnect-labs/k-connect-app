@@ -1,14 +1,14 @@
-import { Pressable, View } from "react-native";
-import { Flex } from "@ui/Flex";
-import useAuthStore from "stores/useAuthStore";
-import { useProfile } from "@hooks/useProfile";
-import { Image } from "expo-image";
-import { Icon } from "react-native-paper";
-import TextC from "@ui/TextC";
-import Option from "./components/Option";
 import { useBalance } from "@hooks/useBalance";
-import { formatBalance } from "utils/formatter";
+import { useProfile } from "@hooks/useProfile";
+import { Flex } from "@ui/Flex";
+import TextC from "@ui/TextC";
+import { Image } from "expo-image";
 import { router } from "expo-router";
+import { Pressable, View } from "react-native";
+import { Icon } from "react-native-paper";
+import useAuthStore from "stores/useAuthStore";
+import { formatBalance } from "utils/formatter";
+import Option from "./components/Option";
 
 const MoreProfile = () => {
  const { data } = useProfile();
@@ -80,8 +80,7 @@ const MoreProfile = () => {
    <Flex direction="column" gap={10} className="w-full" align="center">
     <Flex className="w-full" justify="space-between" align="center" gap={12}>
      <Pressable
-      onPress={() => {}}
-      // router.navigate("")}
+      onPress={() => router.navigate("/more/balance")}
      >
       <Flex
        gap={5}
