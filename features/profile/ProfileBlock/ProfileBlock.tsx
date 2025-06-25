@@ -3,14 +3,14 @@ import { View } from "react-native";
 import useAuthStore from "stores/useAuthStore";
 import { Root } from "types/profile";
 import {
-    ProfileActivity,
-    ProfileDescription,
-    ProfileFollow,
-    ProfileInfo,
-    ProfilePhotos,
-    ProfileStatusBadges,
-    ProfileSubInfo,
-    ProfileUsernames,
+ ProfileActivity,
+ ProfileDescription,
+ ProfileFollow,
+ ProfileInfo,
+ ProfilePhotos,
+ ProfileStatusBadges,
+ ProfileSubInfo,
+ ProfileUsernames,
 } from "./components";
 import ProfileLinks from "./components/ProfileLinks";
 
@@ -29,8 +29,8 @@ export const ProfileBlock = ({ data }: { data: Root | null }) => {
     shadowRadius: 3,
     elevation: 5,
     borderColor: `${data.user.status_color}`,
-    maxWidth: '100%',
-    overflow: 'hidden'
+    maxWidth: "100%",
+    overflow: "hidden",
    }}
    className="bg-[#1e1f20] rounded-xl w-full"
   >
