@@ -1,9 +1,9 @@
-import { SVG_HOME, SVG_PROFILE, SVG_SHARE_NODES } from "assets/svg/svg";
+import { SVG_HOME, SVG_MESSAGE, SVG_PROFILE, SVG_SHARE_NODES } from "assets/svg/svg";
 import { Tabs } from "expo-router";
 import { TouchableOpacity } from "react-native";
-import "../../global.css";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import "../../global.css";
 
 export default function TabLayout() {
  return (
@@ -47,6 +47,16 @@ export default function TabLayout() {
       }}
      />
      <Tabs.Screen
+      name="messenger"
+      options={{
+       title: "Мессенджер",
+       tabBarLabel: "Мессенджер",
+       tabBarIcon: ({ focused }) => (
+        <SVG_MESSAGE size={25} fill={focused ? "#d0bcff" : "#888888"} />
+       ),
+      }}
+     />
+     <Tabs.Screen
       name="profile"
       options={{
        title: "Профиль",
@@ -55,7 +65,6 @@ export default function TabLayout() {
        ),
       }}
      />
-
      <Tabs.Screen
       name="more"
       options={{

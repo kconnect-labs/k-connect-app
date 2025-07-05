@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-
+sample/
 # Expo
 .expo/
 dist/
@@ -41,3 +41,4 @@ app-example
 /.idea
 package-lock.json
 /SampleStyle
+sample/MessengerContext.js

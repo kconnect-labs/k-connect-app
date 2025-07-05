@@ -1,22 +1,24 @@
-import { Modal } from "components/Modal";
+import { PortalProvider } from "@gorhom/portal";
+import { ModalWrapper } from "components/ModalWrapper";
 import NotifyButton from "components/NotifyButton";
+import { MessengerProvider } from "contexts/MessengerContext";
 import { Slot } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { PortalProvider } from "@gorhom/portal";
 import { Provider as PaperProvider } from "react-native-paper";
-import { ModalWrapper } from "components/ModalWrapper";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
  return (
   <GestureHandlerRootView style={{ flex: 1 }}>
    <SafeAreaProvider>
     <PaperProvider>
-     <PortalProvider>
-      <Slot />
-      <ModalWrapper />
-      <NotifyButton />
-     </PortalProvider>
+     <MessengerProvider>
+      <PortalProvider>
+       <Slot />
+       <ModalWrapper />
+       <NotifyButton />
+      </PortalProvider>
+     </MessengerProvider>
     </PaperProvider>
    </SafeAreaProvider>
   </GestureHandlerRootView>

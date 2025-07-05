@@ -7,7 +7,9 @@
       "@components/*": ["./components"],
       "@assets/*": ["./assets/*"],
       "@hooks/*": ["./hooks/*"],
-      "@ui/*": ["./ui/*"]
+      "@ui/*": ["./ui/*"],
+      "contexts/*": ["./contexts/*"],
+      "features/*": ["./features/*"]
     }
   },
   "include": [
