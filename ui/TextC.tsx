@@ -1,5 +1,5 @@
-import { Text, TextProps } from 'react-native';
 import React, { FC } from 'react';
+import { Text, TextProps } from 'react-native';
 
 interface Props extends TextProps {
   className?: string;

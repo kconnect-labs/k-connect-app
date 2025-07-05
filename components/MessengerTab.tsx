@@ -28,23 +28,28 @@ const MessengerTab: React.FC<MessengerTabProps> = ({ focused }) => {
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   badge: {
     position: 'absolute',
-    top: -5,
+    top: -6,
     right: -8,
     backgroundColor: '#ff6b6b',
     borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    minWidth: 18,
+    height: 18,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#1e1f20',
   },
   badgeText: {
     color: '#fff',
     fontSize: 10,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

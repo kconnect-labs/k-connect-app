@@ -1,11 +1,9 @@
-import { View, StyleSheet } from "react-native";
-import TextC from "@ui/TextC";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Badge, Icon } from "react-native-paper";
-import { Flex } from "@ui/Flex";
-import { Image } from "expo-image";
-import useAuthStore from "src/stores/useAuthStore";
 import Avatar from "@ui/Avatar";
+import { Flex } from "@ui/Flex";
+import { StyleSheet, View } from "react-native";
+import { Badge, Icon } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import useAuthStore from "src/stores/useAuthStore";
 
 const TopBar = () => {
  const { user } = useAuthStore();
@@ -15,20 +13,10 @@ const TopBar = () => {
     <View></View>
     <Flex gap={15} align="center">
      <Icon source={"magnify"} size={25} color="#fff" />
-     <View>
+     <View style={styles.notificationContainer}>
       <Icon source={"bell"} size={20} color="#fff" />
       <Badge
-       style={{
-        position: "absolute",
-        top: -10,
-        right: -10,
-        borderRadius: 10,
-        width: 20,
-
-        height: 18,
-        justifyContent: "center",
-        alignItems: "center",
-       }}
+       style={styles.badge}
       >
        18
       </Badge>
@@ -58,6 +46,22 @@ const styles = StyleSheet.create({
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
+ },
+ notificationContainer: {
+  position: 'relative',
+  alignItems: 'center',
+  justifyContent: 'center',
+ },
+ badge: {
+  position: "absolute",
+  top: -8,
+  right: -8,
+  borderRadius: 10,
+  minWidth: 18,
+  height: 18,
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: '#ff6b6b',
  },
 });
 

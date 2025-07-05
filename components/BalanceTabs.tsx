@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from "react";
 import {
-    Animated,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Icon } from "react-native-paper";
 
@@ -37,7 +37,7 @@ const BalanceTabs = React.memo(({ activeTab, setActiveTab }: Props) => {
 
  const indicatorTranslateX = tabAnimation.interpolate({
   inputRange: [0, 1, 2],
-  outputRange: [0, 120, 240], // Adjust these values based on actual tab widths
+  outputRange: [0, 33.33, 66.66], // Процентное позиционирование
  });
 
  return (
@@ -146,9 +146,9 @@ const styles = StyleSheet.create({
   bottom: 0,
   height: 2,
   backgroundColor: "#d0bcff",
-  // width: '33%', // This will be calculated dynamically
-  width: 120,
+  // width будет установлен динамически
  },
 });
 
 export { BalanceTabContent, BalanceTabs };
+

@@ -33,7 +33,7 @@ const ProfileTabs = React.memo(({ activeTab, setActiveTab }: Props) => {
 
  const indicatorTranslateX = tabAnimation.interpolate({
   inputRange: [0, 1, 2],
-  outputRange: [0, 120, 240],
+  outputRange: [0, 33.33, 66.66],
  });
 
  return (
@@ -114,8 +114,6 @@ const styles = StyleSheet.create({
   justifyContent: "center",
  },
  activeTab: {
-  borderBottomWidth: 2,
-  borderBottomColor: "#d0bcff",
  },
  text: {
   color: "#999",

@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from "react";
-import { Animated, Dimensions } from "react-native";
-import { Icon } from "react-native-paper";
 import { Flex } from "@ui/Flex";
 import TextC from "@ui/TextC";
+import React, { useEffect, useRef } from "react";
+import { Animated, Dimensions, StatusBar } from "react-native";
+import { Icon } from "react-native-paper";
 import { useNotifyStore } from "stores/notifyStore";
 
 const NotifyButton = () => {
@@ -30,7 +30,7 @@ const NotifyButton = () => {
 
    return () => clearTimeout(timer);
   }
- }, [visible, duration]);
+ }, [visible, duration, hide]);
 
  if (!visible) return null;
 
@@ -42,15 +42,15 @@ const NotifyButton = () => {
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 2,
+    zIndex: 9999,
+    paddingTop: StatusBar.currentHeight || 0,
    }}
   >
    <Flex
     direction="row"
     align="center"
     gap={8}
-    className="bg-[#1e1f20] border-b-[1px] border-[#292a2b] p-4 rounded-3xl"
-    style={{ paddingTop: screenHeight * 0.05 }}
+    className="bg-[#1e1f20] border-b-[1px] border-[#292a2b] p-4 mx-4 mt-2 rounded-3xl"
    >
     <Icon source={icon} size={24} color={color} />
     <TextC className="flex-1" color={color}>

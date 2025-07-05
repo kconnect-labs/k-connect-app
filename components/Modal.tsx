@@ -1,12 +1,11 @@
 import BottomSheet, {
- BottomSheetBackdrop,
- BottomSheetView,
+    BottomSheetBackdrop,
+    BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { FC, useEffect, useRef, useCallback } from "react";
-import { Portal } from "react-native-paper";
 import { Flex } from "@ui/Flex";
-import TextC from "@ui/TextC";
+import { FC, useCallback, useEffect, useRef } from "react";
 import { StyleSheet } from "react-native";
+import { Portal } from "react-native-paper";
 
 type Props = {
  isOpen: boolean;
@@ -58,9 +57,9 @@ export const Modal: FC<Props> = ({ isOpen, setIsOpen, children }) => {
      }
     }}
    >
-    <BottomSheetView className="px-2 py-2">
-     <Flex direction="column" className="w-full" gap={2}>
-      <Flex direction="column" className="w-full">
+    <BottomSheetView style={styles.content}>
+     <Flex direction="column" style={styles.flexContainer} gap={8}>
+      <Flex direction="column" style={styles.flexContainer}>
        {children}
       </Flex>
      </Flex>
@@ -72,7 +71,16 @@ export const Modal: FC<Props> = ({ isOpen, setIsOpen, children }) => {
 
 const styles = StyleSheet.create({
  bottomSheet: {
-  elevation: 9999999,
-  zIndex: 9999999,
+  elevation: 9999,
+  zIndex: 9999,
+ },
+ content: {
+  paddingHorizontal: 8,
+  paddingVertical: 8,
+ },
+ flexContainer: {
+  width: '100%',
  },
 });
+
+export default Modal;

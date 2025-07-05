@@ -10,7 +10,7 @@ export default function Online() {
  const { data } = useOnlineUsers();
  return (
   <Flex
-   gap={20}
+   gap={2}
    className="bg-[#1a1a1a] mt-10 rounded-xl w-full p-4 "
    direction="column"
   >
