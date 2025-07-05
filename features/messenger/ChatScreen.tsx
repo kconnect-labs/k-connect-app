@@ -7,6 +7,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Alert, FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Icon } from "react-native-paper";
 import useAuthStore from "stores/useAuthStore";
+import { parseDate } from "../../utils/formatter";
 import MessageBubble from "./MessageBubble";
 import StickerPicker from "./StickerPicker";
 
@@ -52,7 +53,7 @@ const formatDateSeparator = (dateKey: string) => {
 const ChatScreen: React.FC = () => {
   const params = useLocalSearchParams();
   const { user } = useAuthStore();
-  const { sendMessage, messages, getMessages, uploadFile, chats } = useMessenger();
+  const { sendMessage, messages, getMessages, uploadFile, chats, markAllMessagesAsRead } = useMessenger();
   const chatId = params.chatId as string;
   const [text, setText] = useState("");
   const [showStickerPicker, setShowStickerPicker] = useState(false);
@@ -120,46 +121,62 @@ const ChatScreen: React.FC = () => {
 
   // Получаем сообщения для текущего чата
   const chatMessages = messages[Number(chatId)] || [];
+  
 
 
+  // Защита от множественных вызовов скролла
+  const [isScrolling, setIsScrolling] = React.useState(false);
 
   // Загружаем сообщения при открытии чата
   useEffect(() => {
     getMessages(Number(chatId), 50).then(() => {
-      // Скролл вниз после загрузки сообщений
+      // Скролл вниз после загрузки сообщений - используем scrollToBottom для надежности
       setTimeout(() => {
-        flatRef.current?.scrollToEnd({ animated: false });
+        scrollToBottom(false);
+      }, 300);
+      
+      // Отмечаем все сообщения как прочитанные при открытии чата
+      setTimeout(() => {
+        markAllMessagesAsRead(Number(chatId));
       }, 500);
     });
-  }, [chatId, getMessages]);
+  }, [chatId, getMessages, markAllMessagesAsRead]);
 
   // Автоматический скролл при изменении сообщений
   useEffect(() => {
+    console.log('ChatScreen: chatMessages changed, length:', chatMessages.length);
     if (chatMessages.length > 0) {
+      // Используем scrollToBottom для надежности
+      console.log('ChatScreen: triggering scrollToBottom due to message count change');
       setTimeout(() => {
-        flatRef.current?.scrollToEnd({ animated: false });
-      }, 200);
+        scrollToBottom(false);
+      }, 100);
     }
   }, [chatMessages.length]);
 
-  // 1. Порядок сообщений: сортируем chatMessages по created_at ASC
-  const sortedChatMessages = [...chatMessages].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+
+  // 1. Порядок сообщений: сортируем chatMessages по ID ASC (более надежно)
+  const sortedChatMessages = [...chatMessages].sort((a, b) => {
+    const aId = typeof a.id === 'string' ? parseInt(a.id) : a.id;
+    const bId = typeof b.id === 'string' ? parseInt(b.id) : b.id;
+    return aId - bId;
+  });
 
   // Группировка сообщений с разделителями дат
   const messagesWithSeparators = useMemo(() => {
     if (!sortedChatMessages.length) return [];
+    
     const result: any[] = [];
     let lastDateKey: string | null = null;
     sortedChatMessages.forEach((message: any, index: number) => {
       let dateKey = message.date_key;
       if (!dateKey && message.created_at) {
-        try {
-          const date = new Date(message.created_at);
-          if (!isNaN(date.getTime())) {
-            dateKey = date.toISOString().slice(0, 10);
-          }
-        } catch (e) {
-          console.warn('Invalid date format:', message.created_at);
+        const date = parseDate(message.created_at);
+        if (date) {
+          dateKey = date.toISOString().slice(0, 10);
+        } else {
+          console.warn('Invalid date format in ChatScreen:', message.created_at);
         }
       }
       if (dateKey && dateKey !== lastDateKey) {
@@ -175,8 +192,65 @@ const ChatScreen: React.FC = () => {
         data: message
       });
     });
+    
     return result;
-  }, [chatMessages]);
+  }, [sortedChatMessages]); // Используем sortedChatMessages вместо chatMessages
+
+  // Функция для надежного скролла вниз
+  const scrollToBottom = (animated: boolean = false, attempts: number = 0) => {
+    const maxAttempts = 2; // Уменьшили до 2 попыток максимум
+    const delay = Math.min(100 * (attempts + 1), 300);
+    
+    // Защита от множественных одновременных вызовов
+    if (isScrolling && attempts === 0) {
+      console.log('scrollToBottom: already scrolling, skipping');
+      return;
+    }
+    
+    console.log(`scrollToBottom called: animated=${animated}, attempts=${attempts}, messagesCount=${messagesWithSeparators.length}`);
+    
+    // Устанавливаем флаг скролла только для первой попытки
+    if (attempts === 0) {
+      setIsScrolling(true);
+    }
+    
+    setTimeout(() => {
+      if (messagesWithSeparators.length > 0) {
+        try {
+          // Попробуем scrollToIndex с последним элементом
+          const lastIndex = messagesWithSeparators.length - 1;
+          console.log(`Attempting scrollToIndex to ${lastIndex} (attempt ${attempts + 1})`);
+          flatRef.current?.scrollToIndex({
+            index: lastIndex,
+            animated,
+            viewPosition: 1 // Показать элемент внизу экрана
+          });
+          console.log(`Successfully called scrollToIndex to ${lastIndex} (attempt ${attempts + 1})`);
+        } catch (error) {
+          console.warn(`ScrollToIndex failed, using scrollToEnd (attempt ${attempts + 1}):`, error);
+          // Fallback к scrollToEnd если scrollToIndex не сработал
+          flatRef.current?.scrollToEnd({ animated });
+        }
+        
+        // Повторить попытку только один раз
+        if (attempts < maxAttempts - 1) {
+          console.log(`Scheduling retry ${attempts + 2}/${maxAttempts} in 100ms`);
+          setTimeout(() => {
+            scrollToBottom(false, attempts + 1);
+          }, 100);
+        } else {
+          console.log(`Max attempts reached (${maxAttempts}), stopping scroll attempts`);
+          // Сбрасываем флаг скролла после завершения всех попыток
+          setIsScrolling(false);
+        }
+      } else {
+        console.log('No messages to scroll to');
+        setIsScrolling(false);
+      }
+    }, delay);
+  };
+
+
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
     if (item.type === 'date_separator') {
@@ -379,8 +453,13 @@ const ChatScreen: React.FC = () => {
           renderItem={renderItem}
           contentContainerStyle={{ padding: 6, flexGrow: 1 }}
           style={{ flex: 1 }}
-          onContentSizeChange={handleContentSizeChange}
-          onLayout={handleLayout}
+          onScrollToIndexFailed={(info) => {
+            console.warn('ScrollToIndex failed:', info);
+            // Fallback к scrollToEnd при ошибке
+            setTimeout(() => {
+              flatRef.current?.scrollToEnd({ animated: false });
+            }, 100);
+          }}
           maintainVisibleContentPosition={{
             minIndexForVisible: 0,
             autoscrollToTopThreshold: 10,

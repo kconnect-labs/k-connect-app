@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import useAuthStore from "stores/useAuthStore";
+import { parseDate } from "../../utils/formatter";
 
 interface ChatItemProps {
   chat: any;
@@ -38,11 +39,72 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat, unreadCount = 0, onPress }) =
   };
   
   const title = getChatTitle();
-  const lastMessageText = chat.last_message?.content || chat.last_message?.text || "";
+  
+  // Обработка текста последнего сообщения
+  const getLastMessageText = () => {
+    const content = chat.last_message?.content || chat.last_message?.text || "";
+    
+    // Проверяем, является ли сообщение стикером
+    if (content.match(/\[STICKER_\d+_\d+\]/) || chat.last_message?.message_type === 'sticker') {
+      return "Стикер";
+    }
+    
+    // Проверяем другие типы сообщений
+    if (chat.last_message?.message_type === 'photo') {
+      return "Фото";
+    }
+    
+    if (chat.last_message?.message_type === 'video') {
+      return "Видео";
+    }
+    
+    if (chat.last_message?.message_type === 'audio') {
+      return "Голосовое сообщение";
+    }
+    
+    if (chat.last_message?.message_type === 'file') {
+      return "Файл";
+    }
+    
+    return content;
+  };
+  
+  const lastMessageText = getLastMessageText();
   let avatarUri = chat.avatar || chat.photo || undefined;
   if (avatarUri && typeof avatarUri === "string" && avatarUri.startsWith("/")) {
     avatarUri = `https://k-connect.ru${avatarUri}`;
   }
+
+  // Format last message time
+  const formatLastMessageTime = (dateString: string) => {
+    if (!dateString) return '';
+    
+    const date = parseDate(dateString);
+    if (!date) {
+      console.warn('Could not parse date in ChatItem:', dateString);
+      return '';
+    }
+    
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString('ru-RU', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+    } else if (diffInHours < 48) {
+      return 'Вчера';
+    } else {
+      return date.toLocaleDateString('ru-RU', { 
+        day: '2-digit', 
+        month: '2-digit' 
+      });
+    }
+  };
+
+  const lastMessageTime = formatLastMessageTime(chat.last_message?.created_at);
 
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
@@ -56,11 +118,16 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat, unreadCount = 0, onPress }) =
           <Text style={styles.title} numberOfLines={1}>
             {title}
           </Text>
-          {unreadCount > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{unreadCount}</Text>
-            </View>
-          )}
+          <View style={styles.rightSection}>
+            {lastMessageTime && (
+              <Text style={styles.timeText}>{lastMessageTime}</Text>
+            )}
+            {unreadCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{unreadCount}</Text>
+              </View>
+            )}
+          </View>
         </View>
         <Text style={styles.lastMessage} numberOfLines={1}>
           {lastMessageText}
@@ -101,6 +168,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     color: "#fff",
+    flex: 1,
+  },
+  rightSection: {
+    alignItems: "flex-end",
+  },
+  timeText: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 2,
   },
   lastMessage: {
     fontSize: 14,

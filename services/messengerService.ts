@@ -34,6 +34,12 @@ class MessengerService {
       console.log('MessengerService.connect: WebSocket already connected');
       return;
     }
+    
+    if (this.websocket && this.websocket.readyState !== WebSocket.CLOSED) {
+      console.log('MessengerService.connect: WebSocket in intermediate state, closing first');
+      this.websocket.close();
+      this.websocket = null;
+    }
 
     if (sessionKey) {
       this.sessionKey = sessionKey;
@@ -48,7 +54,7 @@ class MessengerService {
       this.websocket = new WebSocket(wsUrl);
 
       this.websocket.onopen = () => {
-        console.log('MessengerService.connect: WebSocket opened');
+        console.log('MessengerService.connect: WebSocket opened, readyState:', this.websocket?.readyState);
         if (this.sessionKey) {
           const authMsg = {
             type: "auth",
@@ -56,39 +62,75 @@ class MessengerService {
           } as const;
           console.log('MessengerService.connect: sending auth message:', authMsg);
           this.websocket?.send(JSON.stringify(authMsg));
+        } else {
+          console.warn('MessengerService.connect: no sessionKey available for auth');
         }
       };
 
       // Handle incoming messages
       this.websocket.onmessage = (e) => {
+        console.log('MessengerService: raw WebSocket message received:', e.data);
         try {
           const data = JSON.parse(e.data);
-          console.log("Messenger WS message", data);
+          console.log("Messenger WS message received:", {
+            type: data.type,
+            hasMessage: !!data.message,
+            messageId: data.message?.id,
+            chatId: data.message?.chat_id || data.chat_id,
+            dataChatId: data.chat_id,
+            messageChatId: data.message?.chat_id,
+            fullData: data
+          });
           
           // Handle new message
           if (data.type === 'new_message' && data.message) {
             console.log('MessengerService: received new message:', data.message);
-            // Add chat_id to the message from the WebSocket data
+            // Явно определяем chat_id, не допускаем undefined
+            const chatId = data.chat_id ?? data.message?.chat_id ?? data.chatId;
             const messageWithChatId = {
               ...data.message,
-              chat_id: data.chatId
+              chat_id: chatId !== undefined ? Number(chatId) : data.message?.chat_id
             };
             console.log('MessengerService: message with chat_id:', messageWithChatId);
+            console.log('MessengerService: calling onMessage callback...');
             if (this.onMessage) {
               this.onMessage(messageWithChatId);
+              console.log('MessengerService: onMessage callback called successfully');
+            } else {
+              console.warn('MessengerService: onMessage callback not set!');
             }
+          }
+          // Handle message read receipt
+          else if (data.type === 'message_read' && data.message) {
+            console.log('MessengerService: received message read receipt:', data.message);
+            if (this.onMessage) {
+              this.onMessage(data.message);
+            }
+          }
+          // Handle typing indicator
+          else if (data.type === 'typing_indicator' || data.type === 'typing_indicator_end') {
+            console.log('MessengerService: received typing indicator:', data);
+            // You can add typing indicator handling here if needed
+          }
+          // Handle user status
+          else if (data.type === 'user_status') {
+            console.log('MessengerService: received user status:', data);
+            // You can add user status handling here if needed
           }
         } catch (err) {
           console.warn("Unable to parse WS data", err);
+          console.warn("Raw data was:", e.data);
         }
       };
 
       this.websocket.onerror = (err) => {
         console.error("Messenger WS error", err);
+        console.error("WebSocket readyState:", this.websocket?.readyState);
       };
       
       this.websocket.onclose = (event) => {
         console.log("Messenger WS closed:", event.code, event.reason);
+        console.log("WebSocket readyState:", this.websocket?.readyState);
       };
     } catch (err) {
       console.error("Messenger WebSocket connect error", err);
@@ -108,6 +150,24 @@ class MessengerService {
 
   public setSessionKey(key: string) {
     this.sessionKey = key;
+  }
+
+  public sendReadReceipt(messageId: number, chatId: number) {
+    if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+      try {
+        const message = {
+          type: "read_receipt",
+          messageId,
+          chatId
+        };
+        console.log('MessengerService.sendReadReceipt: sending WebSocket message:', message);
+        this.websocket.send(JSON.stringify(message));
+      } catch (err) {
+        console.error("Failed to send read receipt via WebSocket:", err);
+      }
+    } else {
+      console.warn("WebSocket not connected, cannot send read receipt");
+    }
   }
 
   public async sendMessage(

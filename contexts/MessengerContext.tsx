@@ -11,8 +11,12 @@ interface MessengerContextValue {
   isConnected: boolean;
   chats: any[];
   messages: { [chatId: number]: any[] };
+  unreadCounts: { [key: number]: number };
+  getTotalUnreadCount: () => number;
   refreshChats: () => Promise<void>;
   getMessages: (chatId: number, limit?: number) => Promise<any>;
+  markMessageAsRead: (messageId: number) => Promise<void>;
+  markAllMessagesAsRead: (chatId: number) => Promise<void>;
 }
 
 const MessengerContext = createContext<MessengerContextValue | null>(null);
@@ -26,6 +30,7 @@ export const MessengerProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isConnected, setIsConnected] = useState(false);
   const [chats, setChats] = useState<any[]>([]);
   const [messages, setMessages] = useState<{ [chatId: number]: any[] }>({});
+  const [unreadCounts, setUnreadCounts] = useState<{ [key: number]: number }>({});
 
   // Helper function to process attachments in messages
   const processMessageAttachments = (message: any, chatId: number) => {
@@ -109,38 +114,121 @@ export const MessengerProvider: React.FC<{ children: React.ReactNode }> = ({
         
         // Set up message handler
         service.onMessage = (message: Message) => {
-          console.log('MessengerContext: received message via WebSocket:', message);
+          console.log('MessengerContext: received message via WebSocket:', {
+            id: message.id,
+            chat_id: message.chat_id,
+            content: message.content,
+            sender_id: message.sender_id,
+            created_at: message.created_at
+          });
+          console.log('MessengerContext: processing message...');
           
           // Process attachments if present
           processMessageAttachments(message, message.chat_id);
           
+          // Store original timestamp for sorting
+          const originalTimestamp = message.created_at;
+          
+          // Format message time for display (but keep original for sorting)
+          if (message.created_at) {
+            const date = new Date(message.created_at);
+            if (!isNaN(date.getTime())) {
+              message.created_at = date.toLocaleString('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              });
+              // Store original timestamp for sorting
+              (message as any).original_timestamp = originalTimestamp;
+            }
+          }
+          
           setMessages(prev => {
             const chatMessages = prev[message.chat_id] || [];
             
-            // Check if we have a temporary message for this content
-            const tempMessageIndex = chatMessages.findIndex(msg => 
-              msg.is_temp && 
-              msg.content === message.content && 
-              msg.sender_id === message.sender_id
-            );
-            
-            let newMessages;
-            if (tempMessageIndex !== -1) {
-              // Replace temporary message with real message
-              console.log('MessengerContext: replacing temp message with real message');
-              newMessages = [...chatMessages];
-              newMessages[tempMessageIndex] = message;
-            } else {
-              // Add new message if no matching temp message found
-              console.log('MessengerContext: adding new message');
-              newMessages = [...chatMessages, message];
+            // Check if message already exists (avoid duplicates)
+            if (chatMessages.some(msg => msg.id === message.id)) {
+              console.log('MessengerContext: message already exists, ignoring duplicate');
+              return prev;
             }
+            
+            // Add new message and sort by ID (like in sample)
+            const newMessages = [...chatMessages, message].sort((a: any, b: any) => {
+              const aId = typeof a.id === 'string' ? parseInt(a.id) : a.id;
+              const bId = typeof b.id === 'string' ? parseInt(b.id) : b.id;
+              return aId - bId;
+            });
+            
+            console.log(`MessengerContext: added message ${message.id} to chat ${message.chat_id}, new count: ${newMessages.length}`);
             
             return {
               ...prev,
               [message.chat_id]: newMessages
             };
           });
+          
+          // Update unread count if message is from another user
+          const isFromCurrentUser = message.sender_id === user?.id;
+          if (!isFromCurrentUser) {
+            setUnreadCounts(prev => ({
+              ...prev,
+              [message.chat_id]: (prev[message.chat_id] || 0) + 1
+            }));
+            console.log(`Incremented unread count for chat ${message.chat_id}`);
+          }
+          
+          // Update last message in chat list
+          setChats(prev => {
+            const chatIndex = prev.findIndex(c => c.id === message.chat_id);
+            if (chatIndex === -1) {
+              console.log(`Chat ${message.chat_id} not found in chat list, refreshing chats...`);
+              setTimeout(() => refreshChats(), 100);
+              return prev;
+            }
+            
+            const chat = { ...prev[chatIndex], last_message: message };
+            
+            // Update avatar for personal chats
+            if (!chat.is_group && chat.members) {
+              const otherMember = chat.members.find((m: any) => {
+                const memberId = m.user_id || m.id;
+                const memberIdStr = memberId ? String(memberId) : null;
+                const currentUserIdStr = user?.id ? String(user.id) : null;
+                return memberIdStr && currentUserIdStr && memberIdStr !== currentUserIdStr;
+              });
+              
+              if (otherMember) {
+                const otherUserId = otherMember.user_id || otherMember.id;
+                
+                // Update avatar if needed
+                if (!chat.avatar || 
+                    (chat.avatar && typeof chat.avatar === 'string' && !chat.avatar.startsWith('/static/'))) {
+                  
+                  const photo = otherMember.photo || otherMember.avatar;
+                  if (otherUserId && photo) {
+                    // Build avatar URL manually since service doesn't have getAvatarUrl
+                    if (photo.startsWith('/static/')) {
+                      chat.avatar = `https://k-connect.ru${photo}`;
+                    } else {
+                      chat.avatar = `https://k-connect.ru/static/uploads/avatar/${otherUserId}/${photo}`;
+                    }
+                    console.log(`Updated chat ${message.chat_id} avatar: ${chat.avatar}`);
+                  }
+                }
+              }
+            }
+            
+            // Move chat to top of list
+            const newChats = [...prev];
+            newChats.splice(chatIndex, 1);
+            console.log(`Moving chat ${message.chat_id} to top of chat list`);
+            return [chat, ...newChats];
+          });
+          
+          console.log('MessengerContext: message processing completed');
         };
         
         if (isMounted) setIsConnected(true);
@@ -170,6 +258,25 @@ export const MessengerProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       
       setChats(processedChats);
+      
+      // Update unread counts from server data
+      const newUnreadCounts: { [key: number]: number } = {};
+      processedChats.forEach((chat: any) => {
+        newUnreadCounts[chat.id] = chat.unread_count || 0;
+      });
+      
+      setUnreadCounts(prevCounts => {
+        const prevKeys = Object.keys(prevCounts);
+        const newKeys = Object.keys(newUnreadCounts);
+
+        if (prevKeys.length === newKeys.length && prevKeys.every(k => prevCounts[parseInt(k)] === newUnreadCounts[parseInt(k)])) {
+          return prevCounts;
+        }
+
+        return newUnreadCounts;
+      });
+      
+      console.log('Updated unread counts from server:', newUnreadCounts);
     }
   }, [service]);
 
@@ -319,6 +426,122 @@ export const MessengerProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [isConnected, refreshChats]);
 
+  // Function to get total unread count
+  const getTotalUnreadCount = React.useCallback(() => {
+    return Object.values(unreadCounts).reduce((total, count) => total + count, 0);
+  }, [unreadCounts]);
+
+  // Function to mark message as read
+  const markMessageAsRead = React.useCallback(async (messageId: number) => {
+    if (!user || !messageId) return;
+    
+    try {
+      // Find message in cache
+      const message = Object.values(messages).flat().find(msg => msg.id === messageId);
+      
+      // Check if it's not our own message
+      if (message && message.sender_id === user?.id) {
+        console.log(`Skipping read receipt for own message ${messageId}`);
+        return;
+      }
+      
+      // Send request to server
+      const response = await api.post(`/apiMes/messenger/read/${messageId}`);
+      
+      if (response.data?.success) {
+        console.log(`Message ${messageId} marked as read via API`);
+        
+        // Update local state - remove from unread counts
+        setUnreadCounts(prev => {
+          const updated = { ...prev };
+          // Find which chat this message belongs to
+          Object.keys(messages).forEach(chatId => {
+            const chatMessages = messages[parseInt(chatId)];
+            if (chatMessages.some((msg: any) => msg.id === messageId)) {
+              const chatIdNum = parseInt(chatId);
+              if (updated[chatIdNum] && updated[chatIdNum] > 0) {
+                updated[chatIdNum] = Math.max(0, updated[chatIdNum] - 1);
+              }
+            }
+          });
+          return updated;
+        });
+        
+        // Send read receipt via WebSocket
+        const chatId = Object.keys(messages).find(chatId => 
+          messages[parseInt(chatId)].some((msg: any) => msg.id === messageId)
+        );
+        
+        if (chatId && service.isWebSocketConnected()) {
+          const targetMessage = messages[parseInt(chatId)].find((msg: any) => msg.id === messageId);
+          if (targetMessage && targetMessage.sender_id !== user?.id) {
+            console.log(`Sending read receipt for message ${messageId} in chat ${chatId}`);
+            service.sendReadReceipt(messageId, parseInt(chatId));
+          }
+        }
+      } else {
+        console.warn(`Failed to mark message ${messageId} as read:`, response.data);
+      }
+    } catch (error) {
+      console.error('Error marking message as read:', error);
+    }
+  }, [user, messages]);
+
+  // Function to mark all messages in chat as read
+  const markAllMessagesAsRead = React.useCallback(async (chatId: number) => {
+    if (!user || !chatId) return;
+    
+    try {
+      // Try new API endpoint first
+      const response = await api.post(`/apiMes/messenger/chats/${chatId}/read-all`);
+      
+      if (response.data?.success) {
+        console.log(`All messages in chat ${chatId} marked as read via API`);
+        
+        // Update local state - clear unread count for this chat
+        setUnreadCounts(prev => ({
+          ...prev,
+          [chatId]: 0
+        }));
+        
+        // Send read receipt via WebSocket for the last unread message
+        if (service.isWebSocketConnected()) {
+          const chatMessages = messages[chatId] || [];
+          const unreadMessages = chatMessages.filter((msg: any) => 
+            msg.sender_id !== user?.id && 
+            (!msg.read_by || !msg.read_by.includes(user?.id))
+          );
+          
+          if (unreadMessages.length > 0) {
+            const lastUnread = unreadMessages.reduce((a: any, b: any) => (a.id > b.id ? a : b));
+            if (lastUnread && lastUnread.sender_id !== user?.id) {
+              console.log(`Sending read receipt for last unread message ${lastUnread.id} in chat ${chatId}`);
+              service.sendReadReceipt(lastUnread.id, chatId);
+            }
+          }
+        }
+      } else {
+        console.warn(`Failed to mark all messages as read in chat ${chatId}:`, response.data);
+      }
+    } catch (error) {
+      console.error('Error marking all messages as read:', error);
+      
+      // Fallback: try old API endpoint
+      try {
+        const fallbackResponse = await api.post(`/messenger/read-all/${chatId}`);
+        if (fallbackResponse.data?.success) {
+          console.log(`All messages in chat ${chatId} marked as read via fallback API`);
+          setUnreadCounts(prev => ({
+            ...prev,
+            [chatId]: 0
+          }));
+        }
+      } catch (fallbackError) {
+        console.error('Fallback API also failed:', fallbackError);
+      }
+    }
+  }, [user]);
+
   const value = useMemo<MessengerContextValue>(
     () => ({
       sendMessage,
@@ -326,10 +549,14 @@ export const MessengerProvider: React.FC<{ children: React.ReactNode }> = ({
       isConnected,
       chats,
       messages,
+      unreadCounts,
+      getTotalUnreadCount,
       refreshChats,
       getMessages,
+      markMessageAsRead,
+      markAllMessagesAsRead,
     }),
-    [sendMessage, uploadFile, isConnected, chats, messages, refreshChats, getMessages]
+    [sendMessage, uploadFile, isConnected, chats, messages, unreadCounts, getTotalUnreadCount, refreshChats, getMessages, markMessageAsRead, markAllMessagesAsRead]
   );
 
   return (

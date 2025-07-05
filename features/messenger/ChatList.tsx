@@ -10,7 +10,7 @@ interface ChatListProps {
 }
 
 const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
-  const { chats, refreshChats } = useMessenger();
+  const { chats, refreshChats, unreadCounts, getTotalUnreadCount } = useMessenger();
   const { user } = useAuthStore();
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
@@ -36,7 +36,14 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Мессенджер</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.headerTitle}>Мессенджер</Text>
+          {getTotalUnreadCount() > 0 && (
+            <View style={styles.totalBadge}>
+              <Text style={styles.totalBadgeText}>{getTotalUnreadCount()}</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       <TextInput
@@ -53,6 +60,7 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
         renderItem={({ item }) => (
           <ChatItem
             chat={item}
+            unreadCount={unreadCounts[item.id] || 0}
             onPress={() => {
               if (onSelectChat) onSelectChat(item.id);
               router.push(`/messenger/chat/${item.id}` as any);
@@ -74,10 +82,28 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#2a2a2a",
   },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   headerTitle: {
     fontSize: 24,
     fontWeight: "700",
     color: "#fff",
+  },
+  totalBadge: {
+    backgroundColor: "#d0bcff",
+    borderRadius: 12,
+    minWidth: 24,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    alignItems: "center",
+  },
+  totalBadgeText: {
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "bold",
   },
   search: {
     backgroundColor: "#1f1f1f",

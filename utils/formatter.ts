@@ -61,4 +61,43 @@ export const formatBalance = (amount: number): string => {
   return amount.toString();
 };
 
+// Универсальная функция для парсинга даты из разных форматов
+export const parseDate = (dateString: string): Date | null => {
+  if (!dateString) return null;
+  
+  try {
+    // Проверяем, если время уже в формате "DD.MM.YYYY, HH:mm"
+    if (dateString.includes(',') && dateString.includes('.')) {
+      // Парсим формат "06.07.2025, 00:43"
+      const [datePart, timePart] = dateString.split(', ');
+      const [day, month, year] = datePart.split('.');
+      const [hour, minute] = timePart.split(':');
+      
+      // Создаем дату в формате YYYY-MM-DDTHH:mm
+      const isoString = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00`;
+      const date = new Date(isoString);
+      
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date format after parsing:', dateString);
+        return null;
+      }
+      
+      return date;
+    } else {
+      // Стандартный формат ISO или другой
+      const date = new Date(dateString);
+      
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date format:', dateString);
+        return null;
+      }
+      
+      return date;
+    }
+  } catch (error) {
+    console.warn('Error parsing date:', error, 'for dateString:', dateString);
+    return null;
+  }
+};
+
 

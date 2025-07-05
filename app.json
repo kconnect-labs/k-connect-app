@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "k-app",
+    "name": "К-Коннект",
     "slug": "k-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.konnect.kapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -37,6 +38,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3597110e-cd0c-4306-a888-68024ea842b1"
+      }
     }
   }
 }

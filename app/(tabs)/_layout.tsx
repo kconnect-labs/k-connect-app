@@ -1,8 +1,9 @@
-import { SVG_HOME, SVG_MESSAGE, SVG_PROFILE, SVG_SHARE_NODES } from "assets/svg/svg";
+import { SVG_HOME, SVG_PROFILE, SVG_SHARE_NODES } from "assets/svg/svg";
 import { Tabs, usePathname } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import MessengerTab from "../../components/MessengerTab";
 import "../../global.css";
 
 export default function TabLayout() {
@@ -56,7 +57,7 @@ export default function TabLayout() {
        title: "Мессенджер",
        tabBarLabel: "Мессенджер",
        tabBarIcon: ({ focused }) => (
-        <SVG_MESSAGE size={25} fill={focused ? "#d0bcff" : "#888888"} />
+        <MessengerTab focused={focused} />
        ),
       }}
      />

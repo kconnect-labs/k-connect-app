@@ -1,6 +1,7 @@
 import React from "react";
 import { ActivityIndicator, Dimensions, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Icon } from "react-native-paper";
+import { parseDate } from "../../utils/formatter";
 import TGSSticker from "./TGSSticker";
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -46,12 +47,17 @@ const StickerRenderer: React.FC<{
   style: any;
   onLoad?: () => void;
   onError?: (error: any) => void;
-}> = ({ url, style, onLoad, onError }) => {
+}> = React.memo(({ url, style, onLoad, onError }) => {
   const [stickerType, setStickerType] = React.useState<'tgs' | 'static' | 'unknown' | 'loading'>('loading');
   const [loading, setLoading] = React.useState(true);
   const [fileUrl, setFileUrl] = React.useState<string>(url);
 
   React.useEffect(() => {
+    // Не проверяем заново если URL не изменился и уже загружен
+    if (stickerType !== 'loading') {
+      return;
+    }
+    
     const checkStickerType = async () => {
       try {
         setLoading(true);
@@ -113,7 +119,7 @@ const StickerRenderer: React.FC<{
     };
 
     checkStickerType();
-  }, [url]);
+  }, [url, stickerType]);
 
   if (loading) {
     return (
@@ -152,7 +158,7 @@ const StickerRenderer: React.FC<{
       <ActivityIndicator size="small" color="#ff6b6b" />
     </View>
   );
-};
+});
 
 const MessageBubble: React.FC<Props> = ({ 
   message, 
@@ -223,16 +229,18 @@ const MessageBubble: React.FC<Props> = ({
   // Форматируем время
   const formatTime = (dateString: string) => {
     if (!dateString) return '';
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleTimeString('ru-RU', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: false 
-      });
-    } catch (error) {
+    
+    const date = parseDate(dateString);
+    if (!date) {
+      console.warn('Could not parse date:', dateString);
       return '';
     }
+    
+    return date.toLocaleTimeString('ru-RU', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false 
+    });
   };
 
   // Определяем, короткое ли сообщение (меньше 30 символов)
