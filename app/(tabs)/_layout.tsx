@@ -1,11 +1,14 @@
 import { SVG_HOME, SVG_MESSAGE, SVG_PROFILE, SVG_SHARE_NODES } from "assets/svg/svg";
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
 
 export default function TabLayout() {
+ const pathname = usePathname();
+ const isChatScreen = pathname.includes('/messenger/chat/');
+ 
  return (
   <PaperProvider>
    <SafeAreaView style={{ flex: 1, backgroundColor: "#121212" }}>
@@ -27,6 +30,7 @@ export default function TabLayout() {
        paddingTop: 10,
        borderTopWidth: 0,
        position: "absolute",
+       display: isChatScreen ? "none" : "flex",
       },
       tabBarItemStyle: {
        borderRadius: 15,

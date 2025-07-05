@@ -8,6 +8,7 @@
       "@assets/*": ["./assets/*"],
       "@hooks/*": ["./hooks/*"],
       "@ui/*": ["./ui/*"],
+      "@stores/*": ["./stores/*"],
       "contexts/*": ["./contexts/*"],
       "features/*": ["./features/*"]
     }

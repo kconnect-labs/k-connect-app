@@ -2,6 +2,7 @@ import { useMessenger } from "contexts/MessengerContext";
 import { router } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, Text, TextInput, View } from "react-native";
+import useAuthStore from "stores/useAuthStore";
 import ChatItem from "./ChatItem";
 
 interface ChatListProps {
@@ -10,6 +11,7 @@ interface ChatListProps {
 
 const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
   const { chats, refreshChats } = useMessenger();
+  const { user } = useAuthStore();
   const [search, setSearch] = useState("");
   const [refreshing, setRefreshing] = useState(false);
 
@@ -32,6 +34,11 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Мессенджер</Text>
+      </View>
+
       <TextInput
         value={search}
         onChangeText={setSearch}
@@ -59,12 +66,25 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#121212" },
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: "#1a1a1a",
+    borderBottomWidth: 1,
+    borderBottomColor: "#2a2a2a",
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#fff",
+  },
   search: {
     backgroundColor: "#1f1f1f",
     margin: 12,
     borderRadius: 8,
     paddingHorizontal: 12,
+    paddingVertical: 12,
     color: "#fff",
   },
   empty: { alignItems: 'center', marginTop: 40 },

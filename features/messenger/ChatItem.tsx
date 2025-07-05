@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import useAuthStore from "stores/useAuthStore";
 
 interface ChatItemProps {
   chat: any;
@@ -9,7 +10,34 @@ interface ChatItemProps {
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({ chat, unreadCount = 0, onPress }) => {
-  const title = chat.title || chat.name || "Чат";
+  const { user } = useAuthStore();
+  
+  // Определяем название чата
+  const getChatTitle = () => {
+    // Если это группа, используем название группы
+    if (chat.is_group && chat.title) {
+      return chat.title;
+    }
+    
+    // Если это личный чат, ищем собеседника
+    if (!chat.is_group && chat.members && Array.isArray(chat.members)) {
+      const otherMember = chat.members.find(m => {
+        const memberId = m.user_id || m.id;
+        const memberIdStr = memberId ? String(memberId) : null;
+        const currentUserIdStr = user?.id ? String(user.id) : null;
+        return memberIdStr && currentUserIdStr && memberIdStr !== currentUserIdStr;
+      });
+      
+      if (otherMember) {
+        return otherMember.name || otherMember.username || `Пользователь #${otherMember.user_id || otherMember.id}`;
+      }
+    }
+    
+    // Fallback
+    return chat.title || chat.name || "Чат";
+  };
+  
+  const title = getChatTitle();
   const lastMessageText = chat.last_message?.content || chat.last_message?.text || "";
   let avatarUri = chat.avatar || chat.photo || undefined;
   if (avatarUri && typeof avatarUri === "string" && avatarUri.startsWith("/")) {
