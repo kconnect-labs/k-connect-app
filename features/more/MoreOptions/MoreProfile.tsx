@@ -4,7 +4,8 @@ import { Flex } from "@ui/Flex";
 import TextC from "@ui/TextC";
 import { Image } from "expo-image";
 import { router } from "expo-router";
-import { Pressable, View } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import { InteractionManager, Pressable, View } from "react-native";
 import { Icon } from "react-native-paper";
 import useAuthStore from "stores/useAuthStore";
 import { formatBalance } from "utils/formatter";
@@ -15,6 +16,7 @@ const MoreProfile = () => {
  const { data: dataBalance } = useBalance();
  const { logout, user } = useAuthStore();
  if (!dataBalance || !data) return null;
+ if (!user || !data?.user) return null;
  return (
   <Flex className="w-full h-full relative p-4" direction="column" gap={6}>
    <View
@@ -159,7 +161,27 @@ const MoreProfile = () => {
       <Option icon="book" label="Правила" />
       <Option icon="code-tags" label="API-Документация" />
       <View className="w-full h-[1px] rounded-full bg-[#88888850]" />
-      <Option icon="logout" textColor="#f44336" color="#f44336" label="Выйти" />
+      <Option
+       icon="logout"
+       textColor="#f44336"
+       color="#f44336"
+       label="Выйти"
+       onPress={async () => {
+        try {
+          await logout();
+          await SecureStore.deleteItemAsync("sessionKey");
+          InteractionManager.runAfterInteractions(() => {
+            try {
+              router.replace("/(auth)/login");
+            } catch (e) {
+              console.error("Navigation after logout failed", e);
+            }
+          });
+        } catch (err) {
+          console.error("Logout failed", err);
+        }
+       }}
+      />
      </Flex>
     </Flex>
    </Flex>

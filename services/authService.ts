@@ -1,5 +1,5 @@
-import api from './api';
 import * as SecureStorage from 'expo-secure-store';
+import api from './api';
 
 interface User {
   // Define user properties here
@@ -46,11 +46,18 @@ interface ProfileData {
 const AuthService = {
   login: async (usernameOrEmail: string, password: string): Promise<LoginResponse> => {
     try {
-      const response = await api.post<LoginResponse>('/api/auth/login', {
-        username: usernameOrEmail,
-        password,
-      });
+      const response = await api.post<LoginResponse>(
+        '/api/auth/login?mobile=1',
+        {
+          username: usernameOrEmail,
+          password,
+        },
+        {
+          headers: { 'X-Mobile-Client': '1' },
+        }
+      );
 
+      console.log('AuthService.login raw response', response.data);
       if (response.data.success) {
         // Если вход выполнен успешно, сохраняем данные пользователя
         if (response.data.user) {
@@ -58,9 +65,57 @@ const AuthService = {
           await SecureStorage.setItemAsync('needsProfileSetup', 'false');
 
           // Сохраняем токен, если он предоставлен
-          if (response.data.token) {
-            await SecureStorage.setItemAsync('authToken', response.data.token);
+          let authTokenToStore = response.data.token;
+          if (!authTokenToStore) {
+            const hdr = response.headers as any;
+            authTokenToStore = hdr?.authorization || hdr?.['auth-token'] || hdr?.['x-auth-token'] || null;
+            if (authTokenToStore && typeof authTokenToStore === 'string' && authTokenToStore.startsWith('Bearer ')) {
+              authTokenToStore = authTokenToStore.replace('Bearer ', '');
+            }
           }
+
+          // --- session key ---
+          let sessionKeyToStore: string | null | undefined = (response.data as any).session_key;
+          if (!sessionKeyToStore) {
+            const hdr = response.headers as any;
+            sessionKeyToStore = hdr?.['x-session-key'] || null;
+          }
+
+          if (authTokenToStore) {
+            await SecureStorage.setItemAsync('authToken', authTokenToStore);
+            console.log('AuthService: stored authToken', authTokenToStore);
+
+            // сохраняем sessionKey, если пришёл сразу
+            if (sessionKeyToStore) {
+              await SecureStorage.setItemAsync('sessionKey', sessionKeyToStore);
+              console.log('AuthService: stored sessionKey', sessionKeyToStore);
+            } else {
+              // если всё же ещё нет sessionKey, попробуем получить старым способом
+              try {
+                const skRes = await api.get('/apiMes/auth/get-session-key', {
+                  headers: { 'Cache-Control': 'no-cache', Authorization: `Bearer ${authTokenToStore}` },
+                });
+                if (skRes.data?.session_key) {
+                  await SecureStorage.setItemAsync('sessionKey', skRes.data.session_key);
+                  console.log('AuthService: stored sessionKey (fallback)', skRes.data.session_key);
+                }
+              } catch (e) {
+                console.warn('Не удалось получить session_key', e);
+              }
+            }
+
+            // если есть sessionKey, обновляем default header сразу
+            if (sessionKeyToStore) {
+              api.defaults.headers.common['Authorization'] = `Bearer ${sessionKeyToStore}`;
+            }
+          }
+
+          // Всегда выводим содержимое SecureStore даже если token не пришёл
+          try {
+            const at = await SecureStorage.getItemAsync('authToken');
+            const sk = await SecureStorage.getItemAsync('sessionKey');
+            console.log('SecureStore snapshot (final)', { authToken: at, sessionKey: sk });
+          } catch {}
         }
 
         if (response.data.needsProfileSetup) {
@@ -172,7 +227,6 @@ const AuthService = {
     try {
       await api.post('/api/auth/logout');
 
-      // Очищаем хранилище данных независимо от ответа API
       await SecureStorage.deleteItemAsync('user');
       await SecureStorage.deleteItemAsync('authToken');
       await SecureStorage.deleteItemAsync('needsProfileSetup');
@@ -182,7 +236,6 @@ const AuthService = {
     } catch (error) {
       console.error('Logout error:', error.response?.data || error.message);
 
-      // Still clear data even if API call fails
       await SecureStorage.deleteItemAsync('user');
       await SecureStorage.deleteItemAsync('authToken');
       await SecureStorage.deleteItemAsync('needsProfileSetup');

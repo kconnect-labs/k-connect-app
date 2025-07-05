@@ -2,13 +2,13 @@
 
 # dependencies
 node_modules/
-
+sample/
 # Expo
 .expo/
 dist/
 web-build/
 expo-env.d.ts
-
+android/
 # Native
 .kotlin/
 *.orig.*
@@ -41,3 +41,4 @@ app-example
 /.idea
 package-lock.json
 /SampleStyle
+sample/MessengerContext.js

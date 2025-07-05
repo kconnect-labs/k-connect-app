@@ -1,11 +1,15 @@
 import { SVG_HOME, SVG_PROFILE, SVG_SHARE_NODES } from "assets/svg/svg";
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import { TouchableOpacity } from "react-native";
-import "../../global.css";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import MessengerTab from "../../components/MessengerTab";
+import "../../global.css";
 
 export default function TabLayout() {
+ const pathname = usePathname();
+ const isChatScreen = pathname.includes('/messenger/chat/');
+ 
  return (
   <PaperProvider>
    <SafeAreaView style={{ flex: 1, backgroundColor: "#121212" }}>
@@ -27,6 +31,7 @@ export default function TabLayout() {
        paddingTop: 10,
        borderTopWidth: 0,
        position: "absolute",
+       display: isChatScreen ? "none" : "flex",
       },
       tabBarItemStyle: {
        borderRadius: 15,
@@ -47,6 +52,16 @@ export default function TabLayout() {
       }}
      />
      <Tabs.Screen
+      name="messenger"
+      options={{
+       title: "Мессенджер",
+       tabBarLabel: "Мессенджер",
+       tabBarIcon: ({ focused }) => (
+        <MessengerTab focused={focused} />
+       ),
+      }}
+     />
+     <Tabs.Screen
       name="profile"
       options={{
        title: "Профиль",
@@ -55,7 +70,6 @@ export default function TabLayout() {
        ),
       }}
      />
-
      <Tabs.Screen
       name="more"
       options={{

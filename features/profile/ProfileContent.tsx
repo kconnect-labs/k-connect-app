@@ -19,7 +19,7 @@ const ProfileContent = ({ id }: { id?: number }) => {
  const [refreshing, setRefreshing] = useState<boolean>(false);
  const [activeTab, setActiveTab] = useState<ProfileTabKey>("posts");
 
- const memoizedDataProfile = useMemo(() => dataProfile, [dataProfile?.user.id]);
+ const memoizedDataProfile = useMemo(() => dataProfile, [dataProfile?.user?.id]);
  const memoizedDataPosts = useMemo(() => dataPosts, [dataPosts?.posts]);
 
  const handleTabChange = useCallback((tab: ProfileTabKey) => {
