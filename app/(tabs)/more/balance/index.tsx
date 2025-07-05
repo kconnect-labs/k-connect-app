@@ -1,10 +1,10 @@
-import { View, Text } from "react-native";
-import React from "react";
-import { Flex } from "@ui/Flex";
-import TextC from "@ui/TextC";
-import { Layout } from "@ui/Layout";
-import { StatusBar } from "expo-status-bar";
 import { useBalance } from "@hooks/useBalance";
+import { Flex } from "@ui/Flex";
+import { Layout } from "@ui/Layout";
+import TextC from "@ui/TextC";
+import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import React from "react";
 import { IconButton } from "react-native-paper";
 
 const BalancePage = () => {
@@ -14,6 +14,14 @@ const BalancePage = () => {
   <Layout>
    <StatusBar style="auto" />
    <Flex gap={20} direction="column" className="w-full px-2 mt-20">
+    <Flex className="w-full" justify="flex-start">
+     <IconButton
+      icon="arrow-left"
+      iconColor="#fff"
+      onPress={() => router.back()}
+      className="bg-[#2a2a2a]"
+     />
+    </Flex>
     <Flex direction="column" className="w-full">
      <TextC size={28} className="text-center w-full" weight="bold">
       Коннеки-Баланс

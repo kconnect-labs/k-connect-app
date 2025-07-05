@@ -82,8 +82,7 @@ const MoreProfile = () => {
    <Flex direction="column" gap={10} className="w-full" align="center">
     <Flex className="w-full" justify="space-between" align="center" gap={12}>
      <Pressable
-      onPress={() => {}}
-      // router.navigate("")}
+      onPress={() => router.navigate("/more/balance")}
      >
       <Flex
        gap={5}
