@@ -1,6 +1,6 @@
+import { Flex } from "@ui/Flex";
 import { Layout } from "@ui/Layout";
 import { StatusBar } from "expo-status-bar";
-import { Flex } from "@ui/Flex";
 import BadgesContent from "features/badges/BadgesContent";
 
 const badges = () => {

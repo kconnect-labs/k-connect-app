@@ -1,27 +1,31 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
-    Animated,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { ProfileTabKey, profileTabs } from "types/tabs";
+import { Icon } from "react-native-paper";
+
+type BalanceTabKey = "history" | "assets" | "subscription";
+
+const balanceTabs: BalanceTabKey[] = ["history", "assets", "subscription"];
 
 type Props = {
- activeTab: ProfileTabKey;
- setActiveTab: (tab: ProfileTabKey) => void;
+ activeTab: BalanceTabKey;
+ setActiveTab: (tab: BalanceTabKey) => void;
 };
 
-const ProfileTabs = React.memo(({ activeTab, setActiveTab }: Props) => {
+const BalanceTabs = React.memo(({ activeTab, setActiveTab }: Props) => {
  const [tabAnimation] = useState(
-  new Animated.Value(profileTabs.indexOf(activeTab))
+  new Animated.Value(balanceTabs.indexOf(activeTab))
  );
 
  const animateTabChange = useCallback(
-  (tab: ProfileTabKey) => {
+  (tab: BalanceTabKey) => {
    Animated.timing(tabAnimation, {
-    toValue: profileTabs.indexOf(tab),
+    toValue: balanceTabs.indexOf(tab),
     duration: 300,
     useNativeDriver: true,
    }).start();
@@ -33,19 +37,36 @@ const ProfileTabs = React.memo(({ activeTab, setActiveTab }: Props) => {
 
  const indicatorTranslateX = tabAnimation.interpolate({
   inputRange: [0, 1, 2],
-  outputRange: [0, 33.33, 66.66],
+  outputRange: [0, 33.33, 66.66], // Процентное позиционирование
  });
 
  return (
   <View style={styles.tabContainer} className="overflow-hidden">
-   {profileTabs.map((tab, index) => (
+   {balanceTabs.map((tab, index) => (
     <TouchableOpacity
      key={tab}
      onPress={() => animateTabChange(tab)}
      style={[styles.tab, activeTab === tab && styles.activeTab]}
     >
+     <Icon
+      source={
+       tab === "history"
+        ? "text-box-outline"
+        : tab === "assets"
+        ? "diamond-outline"
+        : "lightning-bolt"
+      }
+      size={20}
+      color={activeTab === tab ? "#d0bcff" : "#ccc"}
+     />
      <Text style={activeTab === tab ? styles.activeText : styles.text}>
-      {tab === "posts" ? "Публикации" : tab === "info" ? "Информация" : "Стена"}
+      {
+       tab === "history"
+        ? "История"
+        : tab === "assets"
+        ? "Активы"
+        : "Подписка"
+      }
      </Text>
     </TouchableOpacity>
    ))}
@@ -54,7 +75,7 @@ const ProfileTabs = React.memo(({ activeTab, setActiveTab }: Props) => {
     style={[
      styles.indicator,
      {
-      width: `${100 / profileTabs.length}%`,
+      width: `${100 / balanceTabs.length}%`,
       transform: [{ translateX: indicatorTranslateX }],
      },
     ]}
@@ -63,17 +84,9 @@ const ProfileTabs = React.memo(({ activeTab, setActiveTab }: Props) => {
  );
 });
 
-const ProfileContent = React.memo(
- ({ activeTab }: { activeTab: ProfileTabKey }) => {
+const BalanceTabContent = React.memo(
+ ({ activeTab }: { activeTab: BalanceTabKey }) => {
   const [tabAnimation] = useState(new Animated.Value(1));
-
-  const cachedTabs = useMemo(() => {
-   return {
-    posts: <Text>Публикации Content</Text>,
-    info: <Text>Информация Content</Text>,
-    wall: <Text>Стена Content</Text>,
-   };
-  }, []);
 
   React.useEffect(() => {
    Animated.timing(tabAnimation, {
@@ -92,7 +105,9 @@ const ProfileContent = React.memo(
   return (
    <View style={{ flex: 1 }}>
     <Animated.View style={{ opacity: tabAnimation }}>
-     {cachedTabs[activeTab]}
+     {activeTab === "history" && <Text>История контент</Text>}
+     {activeTab === "assets" && <Text>Активы контент</Text>}
+     {activeTab === "subscription" && <Text>Подписка контент</Text>}
     </Animated.View>
    </View>
   );
@@ -105,6 +120,7 @@ const styles = StyleSheet.create({
   backgroundColor: "#1e1f20",
   borderRadius: 8,
   position: "relative",
+  height: 60,
  },
  tab: {
   flex: 1,
@@ -114,24 +130,25 @@ const styles = StyleSheet.create({
   justifyContent: "center",
  },
  activeTab: {
+  // No specific border, handled by indicator
  },
  text: {
   color: "#999",
-  fontSize: 12,
+  fontSize: 10,
  },
  activeText: {
-  color: "#fff",
+  color: "#d0bcff",
   fontWeight: "600",
-  fontSize: 12,
+  fontSize: 10,
  },
  indicator: {
   position: "absolute",
   bottom: 0,
   height: 2,
   backgroundColor: "#d0bcff",
-  width: "33%",
+  // width будет установлен динамически
  },
 });
 
-export { ProfileContent, ProfileTabs };
+export { BalanceTabContent, BalanceTabs };
 

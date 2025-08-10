@@ -1,8 +1,8 @@
 import axios, {
- AxiosInstance,
- AxiosRequestConfig,
- AxiosResponse,
- AxiosError,
+    AxiosError,
+    AxiosInstance,
+    AxiosRequestConfig,
+    AxiosResponse,
 } from "axios";
 import * as SecureStorage from "expo-secure-store";
 
@@ -21,7 +21,7 @@ api.interceptors.request.use(
  async (config: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
   try {
    const token = await SecureStorage.getItemAsync("authToken");
-   if (token && config.headers) {
+   if (token && config.headers && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
    }
   } catch (error) {

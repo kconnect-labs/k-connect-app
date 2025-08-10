@@ -2,7 +2,7 @@ import { Flex } from "@ui/Flex";
 import TextC from "@ui/TextC";
 import { router } from "expo-router";
 import { FC } from "react";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { Icon } from "react-native-paper";
 
 type Props = {
@@ -14,14 +14,32 @@ export const Header: FC<Props> = ({ text }) => {
   <Flex
    align="center"
    gap={20}
-   className="p-4 border-b border-[#1e1f20] rounded-b-xl"
+   style={styles.header}
   >
-   <Pressable onPress={() => router.back()}>
+   <Pressable onPress={() => router.back()} style={styles.backButton}>
     <Icon source={"arrow-left"} color="#fff" size={24} />
    </Pressable>
-   <TextC size={20} weight="bold">
+   <TextC size={20} weight="bold" style={styles.title}>
     {text}
    </TextC>
   </Flex>
  );
 };
+
+const styles = StyleSheet.create({
+ header: {
+  padding: 16,
+  borderBottomWidth: 1,
+  borderBottomColor: "#1e1f20",
+  borderBottomLeftRadius: 12,
+  borderBottomRightRadius: 12,
+  backgroundColor: "#242229",
+ },
+ backButton: {
+  padding: 4,
+ },
+ title: {
+  flex: 1,
+  textAlign: 'center',
+ },
+});

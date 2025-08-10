@@ -18,20 +18,7 @@ const ProfileStatusBadges = React.memo(({ data }: { data: Root | null }) => {
     color="#6b6b67"
     children={<TextC>@{data?.user?.username ?? "0"}</TextC>}
    />
-   {dataOnline?.is_online ? (
-    <Badge
-     color="#1f3322"
-     children={<TextC color="#22c45d">онлайн</TextC>}
-     icon={<View className="w-2 h-2 bg-green-500 rounded-full" />}
-     textColor="#66bb6a"
-    />
-   ) : (
-    <Badge
-     color="#888888"
-     children={<TextC color="#ccc">{dataOnline?.last_active}</TextC>}
-     textColor="#66bb6a"
-    />
-   )}
+
 
    {data?.subscription?.active && (
     <Pressable
