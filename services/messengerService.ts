@@ -1,6 +1,8 @@
 import api from "./api";
 
-const API_BASE = "https://k-connect.ru";
+import { BASE_URL } from "../utils/constants";
+
+const API_BASE = BASE_URL.replace("/api/v2", "");
 
 export interface SendMessageResult {
   success: boolean;
@@ -48,7 +50,7 @@ class MessengerService {
 
     try {
       const wsProtocol = API_BASE.startsWith("https") ? "wss" : "ws";
-      const wsUrl = `${wsProtocol}://k-connect.ru/ws/messenger`;
+      const wsUrl = `${wsProtocol}://${API_BASE.replace('https://', '')}/ws/messenger`;
       console.log('MessengerService.connect: connecting to:', wsUrl);
       
       this.websocket = new WebSocket(wsUrl);
@@ -205,7 +207,7 @@ class MessengerService {
       console.log('MessengerService.sendMessage: HTTP payload:', payload);
       
       const res = await api.post(
-        `/apiMes/messenger/chats/${chatId}/messages`,
+        `/messenger/chats/${chatId}/messages`,
         payload,
         {
           headers: {
@@ -224,7 +226,7 @@ class MessengerService {
 
   public async getChats(page: number = 1, perPage: number = 50) {
     try {
-      const res = await api.get(`/apiMes/messenger/chats`, {
+      const res = await api.get(`/messenger/chats`, {
         params: { page, per_page: perPage },
         headers: {
           "Content-Type": "application/json",

@@ -1,6 +1,5 @@
 import { Flex } from "@ui/Flex";
 import TextC from "@ui/TextC";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -65,12 +64,7 @@ const AuthContent = () => {
   };
 
  return (
-    <LinearGradient
-      colors={["#0f0f23", "#1a1a2e", "#16213e"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={{ flex: 1 }}
-    >
+    <View className="flex-1 theme-bg">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -80,10 +74,10 @@ const AuthContent = () => {
             <Flex direction="column" align="center" gap={25} className="w-full">
               <Logo />
               <View className="w-full text-center">
-                <TextC size={32} className="w-full text-center font-bold text-text-primary">
+                <TextC size={32} className="w-full text-center font-bold text-theme-primary">
                   Добро пожаловать
                 </TextC>
-                <TextC size={16} className="w-full text-center mt-3 font-medium text-text-secondary">
+                <TextC size={16} className="w-full text-center mt-3 font-medium text-theme-secondary">
                   Войдите в свой аккаунт K-Коннект
                 </TextC>
               </View>
@@ -92,13 +86,13 @@ const AuthContent = () => {
             <Flex direction="column" gap={25} className="w-full">
               <View className="relative">
                 <View style={{ position: "absolute", left: 15, top: "50%", transform: [{ translateY: -10 }] }}>
-                  <Icon source="account" size={22} color="#b0b0b0" />
+                  <Icon source="account" size={22} color="var(--theme-text-secondary)" />
                 </View>
                 <TextInput
                   value={usernameOrEmail}
                   onChangeText={(text) => setUsernameOrEmail(text)}
                   placeholder="Имя пользователя или Email"
-                  placeholderTextColor="#b0b0b0"
+                  placeholderTextColor="var(--theme-text-secondary)"
                   className="input-field w-full pl-12 pr-4 py-5 text-lg font-medium"
                   style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 6, elevation: 5 }}
                 />
@@ -106,13 +100,13 @@ const AuthContent = () => {
 
               <View className="relative">
                 <View style={{ position: "absolute", left: 15, top: "50%", transform: [{ translateY: -10 }] }}>
-                  <Icon source="lock" size={22} color="#b0b0b0" />
+                  <Icon source="lock" size={22} color="var(--theme-text-secondary)" />
                 </View>
                 <TextInput
                   value={password}
                   onChangeText={(text) => setPassword(text)}
                   placeholder="Пароль"
-                  placeholderTextColor="#b0b0b0"
+                  placeholderTextColor="var(--theme-text-secondary)"
                   secureTextEntry={!passwordVisible}
                   className="input-field w-full pl-12 pr-14 py-5 text-lg font-medium"
                   style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 6, elevation: 5 }}
@@ -130,7 +124,7 @@ const AuthContent = () => {
                   <Icon
                     source={!passwordVisible ? "eye-off" : "eye"}
                     size={22}
-                    color="#b0b0b0"
+                    color="var(--theme-text-secondary)"
                   />
                 </Button>
               </View>
@@ -139,7 +133,7 @@ const AuthContent = () => {
                 <Button
                   onPress={handleLogin}
                   className="btn-primary w-full"
-                  style={{ borderRadius: 20, shadowColor: "#6366f1", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 10, elevation: 8 }}
+                  style={{ borderRadius: 20, shadowColor: "var(--theme-main-color)", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 10, elevation: 8 }}
                   loading={isLoadingButton}
                   disabled={isLoadingButton}
                 >
@@ -150,8 +144,8 @@ const AuthContent = () => {
               </View>
 
               <Flex align="center" gap={6} justify="center" className="w-full mt-6">
-                <TextC size={16} className="text-text-secondary">Нет аккаунта?</TextC>
-                <TextC size={16} className="text-primary font-bold" onPress={() => router.replace("/register")}>
+                <TextC size={16} className="text-theme-secondary">Нет аккаунта?</TextC>
+                <TextC size={16} className="text-theme-accent font-bold" onPress={() => router.replace("/register")}>
                   Зарегистрироваться
                 </TextC>
               </Flex>
@@ -173,8 +167,8 @@ const AuthContent = () => {
               </View> */}
 
               {error && (
-                <View className="w-full bg-error bg-opacity-20 border border-error rounded-2xl p-4 mt-4">
-                  <TextC size={16} className="text-error text-center font-medium">
+                <View className="w-full bg-red-500 bg-opacity-20 border border-red-500 rounded-theme-main p-4 mt-4">
+                  <TextC size={16} className="text-theme-error text-center font-medium">
                     {error}
                   </TextC>
                 </View>
@@ -183,7 +177,7 @@ const AuthContent = () => {
           </Flex>
         </ScrollView>
       </KeyboardAvoidingView>
-    </LinearGradient>
+    </View>
   );
 };
 

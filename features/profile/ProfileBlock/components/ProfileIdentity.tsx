@@ -1,12 +1,13 @@
 import { Flex } from "@ui/Flex";
-import { Root } from "types/profile";
-import { Pressable, Alert } from "react-native";
-import { SvgUri } from "react-native-svg";
-import { formatStatus } from "utils/formatter";
-import { SVG_CHECK_CIRCLE } from "assets/svg/svg";
 import TextC from "@ui/TextC";
+import { SVG_CHECK_CIRCLE } from "assets/svg/svg";
 import { Image } from "expo-image";
 import React from "react";
+import { Alert, Pressable } from "react-native";
+import { SvgUri } from "react-native-svg";
+import { Root } from "types/profile";
+import { formatStatus } from "utils/formatter";
+import { buildImageUrl } from "utils/urlUtils";
 
 const ProfileIdentity = React.memo(({ data }: { data: Root }) => {
  return (
@@ -28,13 +29,13 @@ const ProfileIdentity = React.memo(({ data }: { data: Root }) => {
    </Pressable>
    {data?.achievement?.image_path?.endsWith(".svg") ? (
     <SvgUri
-     uri={`https://k-connect.ru/static/images/bages/${data?.achievement?.image_path}`}
+     uri={buildImageUrl(`/static/images/bages/${data?.achievement?.image_path}`)}
      width={20}
      height={20}
     />
    ) : (
     <Image
-     source={`https://k-connect.ru/static/images/bages/${data?.achievement?.image_path}`}
+     source={{ uri: buildImageUrl(`/static/images/bages/${data?.achievement?.image_path}`) }}
      style={{ width: 20, height: 20 }}
     />
    )}

@@ -1,13 +1,13 @@
-import { Post, Root } from "types/posts";
-import { Flex } from "@ui/Flex";
-import Avatar from "@ui/Avatar";
-import TextC from "@ui/TextC";
-import { formatStatus, postTimeFormatter } from "utils/formatter";
-import { Button, Icon } from "react-native-paper";
-import useAuthStore from "stores/useAuthStore";
 import { SVG_CHECK_CIRCLE } from "@assets/svg/svg";
+import Avatar from "@ui/Avatar";
+import { Flex } from "@ui/Flex";
+import TextC from "@ui/TextC";
 import { Image } from "expo-image";
 import { TypesPost } from "features/post/PostComponent/PostComponent";
+import { Icon } from "react-native-paper";
+import useAuthStore from "stores/useAuthStore";
+import { formatStatus, postTimeFormatter } from "utils/formatter";
+import { buildImageUrl } from "utils/urlUtils";
 
 const HeaderPost = ({ item }: { item: TypesPost }) => {
  const { user } = useAuthStore();
@@ -18,7 +18,7 @@ const HeaderPost = ({ item }: { item: TypesPost }) => {
      userId={item.user.id}
      size={20}
      image={{
-      uri: `https://k-connect.ru/static/uploads/${item.user.avatar_url}`,
+      uri: buildImageUrl(`/static/uploads/${item.user.avatar_url}`),
      }}
     />
     <Flex direction="column">
@@ -33,9 +33,9 @@ const HeaderPost = ({ item }: { item: TypesPost }) => {
         width: 20,
         height: 20,
        }}
-       source={
-        "https://k-connect.ru/static/images/bages/shop/2972aca5-5dc9-403c-a660-621f1a0bf379.svg"
-       }
+       source={{
+        uri: buildImageUrl("/static/images/bages/shop/2972aca5-5dc9-403c-a660-621f1a0bf379.svg"),
+       }}
       />
      </Flex>
      <TextC size={12} className="opacity-50">

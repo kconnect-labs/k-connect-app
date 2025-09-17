@@ -10,6 +10,11 @@ export const useFollowers = () => {
  const { user } = useAuthStore();
 
  const fetchPosts = useCallback(async () => {
+  if (!user?.username) {
+   setIsLoading(false);
+   return;
+  }
+
   try {
    setIsLoading(true);
    const response = await fetch(
@@ -17,7 +22,7 @@ export const useFollowers = () => {
     {
      method: "GET",
      headers: {
-      "X-API-Key": "liquide-v2",
+      "X-API-Key": "liquide-gg-v2",
      },
     }
    );
@@ -35,7 +40,7 @@ export const useFollowers = () => {
   } finally {
    setIsLoading(false);
   }
- }, []);
+ }, [user?.username]);
 
  useEffect(() => {
   fetchPosts();

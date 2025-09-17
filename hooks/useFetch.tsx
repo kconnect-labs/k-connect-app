@@ -1,4 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
+import { Platform } from "react-native";
+
+// Cross-platform storage wrapper
+const storage = {
+  getItemAsync: async (key: string): Promise<string | null> => {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(key);
+    } else {
+      const SecureStore = await import('expo-secure-store');
+      return await SecureStore.default.getItemAsync(key);
+    }
+  },
+};
 
 type FetchOptions<TRequestBody = unknown> = {
  url: string;
@@ -23,14 +36,22 @@ export const useFetch = <TResponse, TRequestBody = unknown>({
   try {
    setIsLoading(true);
 
-   const requestOptions: RequestInit = {
-    method,
-    headers: {
-     "X-API-Key": "liquide-v2",
-     "Content-Type": "application/json",
-     ...headers,
-    },
+   // Get session key for authorization
+   const sessionKey = await storage.getItemAsync('sessionKey');
+   const authHeaders: Record<string, string> = {
+    "X-API-Key": "liquide-gg-v2",
+    "Content-Type": "application/json",
+    ...headers,
    };
+
+   if (sessionKey) {
+    authHeaders.Authorization = `Bearer ${sessionKey}`;
+   }
+
+    const requestOptions: RequestInit = {
+     method,
+     headers: authHeaders,
+    };
 
    if (method !== "GET" && body) {
     requestOptions.body = JSON.stringify(body);

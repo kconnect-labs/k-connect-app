@@ -1,26 +1,47 @@
 import axios, {
-    AxiosError,
-    AxiosInstance,
-    AxiosRequestConfig,
-    AxiosResponse,
+  AxiosError,
+  AxiosInstance,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
 } from "axios";
-import * as SecureStorage from "expo-secure-store";
+import { Platform } from "react-native";
+import { BASE_URL } from "../utils/constants";
+
+// Cross-platform storage wrapper
+const storage = {
+  getItemAsync: async (key: string): Promise<string | null> => {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(key);
+    } else {
+      const SecureStore = await import('expo-secure-store');
+      return await SecureStore.default.getItemAsync(key);
+    }
+  },
+  deleteItemAsync: async (key: string) => {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(key);
+    } else {
+      const SecureStore = await import('expo-secure-store');
+      await SecureStore.default.deleteItemAsync(key);
+    }
+  },
+};
 
 // Создаем экземпляр axios с базовым URL
 const api: AxiosInstance = axios.create({
- baseURL: "https://k-connect.ru",
+ baseURL: BASE_URL,
  timeout: 30000, // Увеличиваем timeout до 30 секунд
  headers: {
-  "X-API-Key": "liquide-v2",
+  "X-API-Key": "liquide-gg-v2",
   "Content-Type": "application/json",
  },
 });
 
 // Перехватчик запросов для добавления токена аутентификации
 api.interceptors.request.use(
- async (config: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
+ async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
   try {
-   const token = await SecureStorage.getItemAsync("authToken");
+   const token = await storage.getItemAsync("authToken");
    if (token && config.headers && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
    }
@@ -47,7 +68,7 @@ api.interceptors.response.use(
    );
   }
 
-  const originalRequest = error.config as AxiosRequestConfig & {
+  const originalRequest = error.config as InternalAxiosRequestConfig & {
    _retry?: boolean;
   };
 
@@ -64,11 +85,11 @@ api.interceptors.response.use(
     // return api(originalRequest);
 
     // Пока просто выходим из системы при истечении токена
-    await SecureStorage.deleteItemAsync("authToken");
+    await storage.deleteItemAsync("authToken");
     return Promise.reject(error);
    } catch (refreshError) {
     // При ошибке обновления токена выходим из системы
-    await SecureStorage.deleteItemAsync("authToken");
+    await storage.deleteItemAsync("authToken");
     return Promise.reject(refreshError);
    }
   }

@@ -1,55 +1,49 @@
-// import { useEffect, useState, useCallback } from "react";
-// import { Root } from "src/types/post";
-// import { Post } from "src/types/posts";
+import { useCallback, useEffect, useState } from "react";
+import { Root } from "types/post";
 
-// export const usePost = ({ id }: { id: string }) => {
-//   const [data, setData] = useState<Root | null>(null);
-//   const [error, setError] = useState<Error | null>(null);
-//   const [isLoading, setIsLoading] = useState(true);
+export const usePost = ({ id }: { id: string | number }) => {
+ const [data, setData] = useState<Root | null>(null);
+ const [error, setError] = useState<Error | null>(null);
+ const [isLoading, setIsLoading] = useState(true);
 
-//   const fetchPost = useCallback(async () => {
-//     try {
-//       setIsLoading(true);
-//       const response = await fetch(`https://k-connect.ru/api/posts/${id}`, {
-//         method: "GET",
-//         headers: {
-//           "X-API-Key": "liquide-loshara-gg",
-//           "Content-Type": "application/json",
-//         },
-//       });
-//       if (!response.ok) {
-//         throw new Error("Network response was not ok");
-//       }
-//       const result = await response.json();
-//       setData(result);
-//       setError(null);
-//     } catch (err) {
-//       setError(
-//         err instanceof Error ? err : new Error("An unknown error occurred")
-//       );
-//       setData(null);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   }, [id]);
+ const fetchPost = useCallback(async () => {
+  if (!id) {
+   setIsLoading(false);
+   return;
+  }
 
-//   useEffect(() => {
-//     fetchPost();
-//   }, [fetchPost]);
+  try {
+   setIsLoading(true);
+   const response = await fetch(`https://k-connect.ru/api/posts/${id}`, {
+    method: "GET",
+    headers: {
+     "X-API-Key": "liquide-gg-v2",
+     "Content-Type": "application/json",
+    },
+   });
+   if (!response.ok) {
+    throw new Error("Network response was not ok");
+   }
+   const result = await response.json();
+   setData(result);
+   setError(null);
+  } catch (err) {
+   setError(
+    err instanceof Error ? err : new Error("An unknown error occurred")
+   );
+   setData(null);
+  } finally {
+   setIsLoading(false);
+  }
+ }, [id]);
 
-//   const refetch = useCallback(() => {
-//     return fetchPost();
-//   }, [fetchPost]);
+ useEffect(() => {
+  fetchPost();
+ }, [fetchPost]);
 
-//   return { data, error, isLoading, refetch };
-// };
+ const refetch = useCallback(() => {
+  return fetchPost();
+ }, [fetchPost]);
 
-import { useFetch } from "./useFetch";
-import { Root } from "src/types/post";
-
-export const usePost = ({ id }: { id: any }) => {
- return useFetch<Root>({
-  url: `https://k-connect.ru/api/posts/${id}`,
-  dependsOn: id,
- });
+ return { data, error, isLoading, refetch };
 };

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { TextInput, View } from "react-native";
 import { Button } from "react-native-paper";
 import useAuthStore from "stores/useAuthStore";
+import { buildImageUrl } from "utils/urlUtils";
 
 const CreatePost = () => {
  const [textPost, setTextPost] = useState<string>("");
@@ -25,7 +26,7 @@ const CreatePost = () => {
     <Avatar
      userId={user.id}
      size={20}
-     image={{ uri: `https://k-connect.ru${user.avatar_url}` }}
+     image={{ uri: buildImageUrl(user.avatar_url) }}
     />
     <View className="flex-1">
      <TextInput

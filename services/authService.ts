@@ -1,8 +1,34 @@
-import * as SecureStorage from 'expo-secure-store';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 import api from './api';
 
+// Wrapper functions for cross-platform storage
+const storage = {
+  setItemAsync: async (key: string, value: string) => {
+    if (Platform.OS === 'web') {
+      localStorage.setItem(key, value);
+    } else {
+      await SecureStore.setItemAsync(key, value);
+    }
+  },
+  getItemAsync: async (key: string): Promise<string | null> => {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(key);
+    } else {
+      return await SecureStore.getItemAsync(key);
+    }
+  },
+  deleteItemAsync: async (key: string) => {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(key);
+    } else {
+      await SecureStore.deleteItemAsync(key);
+    }
+  },
+};
+
 interface User {
-  
+
 }
 
 interface LoginResponse {
@@ -54,7 +80,7 @@ const AuthService = {
           password,
         },
         {
-          headers: { 'X-Mobile-Client': '1', 'X-API-Key': 'liquide-v2' },
+          headers: { 'X-Mobile-Client': '1', 'X-API-Key': 'liquide-gg-v2' },
         }
       );
 
@@ -62,8 +88,8 @@ const AuthService = {
       if (response.data.success) {
         // Если вход выполнен успешно, сохраняем данные пользователя
         if (response.data.user) {
-          await SecureStorage.setItemAsync('user', JSON.stringify(response.data.user));
-          await SecureStorage.setItemAsync('needsProfileSetup', 'false');
+          await storage.setItemAsync('user', JSON.stringify(response.data.user));
+          await storage.setItemAsync('needsProfileSetup', 'false');
 
           // Сохраняем токен, если он предоставлен
           let authTokenToStore = response.data.token;
@@ -83,21 +109,21 @@ const AuthService = {
           }
 
           if (authTokenToStore) {
-            await SecureStorage.setItemAsync('authToken', authTokenToStore);
+            await storage.setItemAsync('authToken', authTokenToStore);
             console.log('AuthService: stored authToken', authTokenToStore);
 
             // сохраняем sessionKey, если пришёл сразу
             if (sessionKeyToStore) {
-              await SecureStorage.setItemAsync('sessionKey', sessionKeyToStore);
+              await storage.setItemAsync('sessionKey', sessionKeyToStore);
               console.log('AuthService: stored sessionKey', sessionKeyToStore);
             } else {
               // если всё же ещё нет sessionKey, попробуем получить старым способом
               try {
                 const skRes = await api.get('/apiMes/auth/get-session-key', {
-                  headers: { 'Cache-Control': 'no-cache', Authorization: `Bearer ${authTokenToStore}` },  
+                  headers: { 'Cache-Control': 'no-cache', Authorization: `Bearer ${authTokenToStore}` },
                 });
                 if (skRes.data?.session_key) {
-                  await SecureStorage.setItemAsync('sessionKey', skRes.data.session_key);
+                  await storage.setItemAsync('sessionKey', skRes.data.session_key);
                   console.log('AuthService: stored sessionKey (fallback)', skRes.data.session_key);
                 }
               } catch (e) {
@@ -113,29 +139,34 @@ const AuthService = {
 
           // Всегда выводим содержимое SecureStore даже если token не пришёл
           try {
-            const at = await SecureStorage.getItemAsync('authToken');
-            const sk = await SecureStorage.getItemAsync('sessionKey');
+            const at = await storage.getItemAsync('authToken');
+            const sk = await storage.getItemAsync('sessionKey');
             console.log('SecureStore snapshot (final)', { authToken: at, sessionKey: sk });
           } catch {}
         }
 
         if (response.data.needsProfileSetup) {
-          await SecureStorage.setItemAsync('needsProfileSetup', 'true');
+          await storage.setItemAsync('needsProfileSetup', 'true');
 
           if (response.data.chat_id) {
-            await SecureStorage.setItemAsync('chatId', response.data.chat_id);
+            await storage.setItemAsync('chatId', response.data.chat_id);
           }
         } else {
-          await SecureStorage.deleteItemAsync('needsProfileSetup');
+          await storage.deleteItemAsync('needsProfileSetup');
         }
 
         return response.data;
       } else {
         throw new Error(response.data.error || 'Login failed');
       }
-    } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
-      throw error;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Login error:', error.message);
+        throw error;
+      } else {
+        console.error('Login error:', error);
+        throw new Error('Login failed due to unknown error');
+      }
     }
   },
 
@@ -149,40 +180,25 @@ const AuthService = {
         password,
       }, {
         headers: {
-          'X-API-Key': 'liquide-v2'
+          'X-API-Key': 'liquide-gg-v2'
         }
       });
 
       return response.data;
-    } catch (error: any) {
-      console.error('Register error:', error.response?.data || error.message);
-
-      let errorMessage = 'Registration failed';
-
-      if (!error.response) {
-        // Network error
-        errorMessage = 'Network error. Please check your internet connection and try again.';
-      } else if (error.response.status >= 500) {
-        // Server error
-        errorMessage = 'Server error. Please try again later.';
-      } else if (error.response.status === 429) {
-        // Rate limit
-        errorMessage = error.response.data?.error || 'Too many registration attempts. Please try again later.';
-      } else if (error.response.status >= 400) {
-        // Client error (validation, etc.)
-        errorMessage = error.response.data?.error || 'Invalid input. Please check your details and try again.';
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Register error:', error.message);
+        throw error;
       } else {
-        // Other errors
-        errorMessage = error.message || 'An unexpected error occurred.';
+        console.error('Register error:', error);
+        throw new Error('Registration failed due to unknown error');
       }
-
-      throw new Error(errorMessage);
     }
   },
 
   setupProfile: async (profileData: ProfileData): Promise<ProfileSetupResponse> => {
     try {
-      const chatId = await SecureStorage.getItemAsync('chatId');
+      const chatId = await storage.getItemAsync('chatId');
       if (chatId) {
         profileData.chat_id = chatId;
       }
@@ -214,15 +230,20 @@ const AuthService = {
 
       if (response.data.success && response.data.user) {
         // Store user data
-        await SecureStorage.setItemAsync('user', JSON.stringify(response.data.user));
-        await SecureStorage.setItemAsync('needsProfileSetup', 'false');
-        await SecureStorage.deleteItemAsync('chatId');
+        await storage.setItemAsync('user', JSON.stringify(response.data.user));
+        await storage.setItemAsync('needsProfileSetup', 'false');
+        await storage.deleteItemAsync('chatId');
       }
 
       return response.data;
-    } catch (error) {
-      console.error('Profile setup error:', error.response?.data || error.message);
-      throw error;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Profile setup error:', error.message);
+        throw error;
+      } else {
+        console.error('Profile setup error:', error);
+        throw new Error('Profile setup failed due to unknown error');
+      }
     }
   },
 
@@ -231,22 +252,30 @@ const AuthService = {
       const response = await api.get<AuthCheckResponse>('/api/auth/check');
 
       if (response.data.isAuthenticated && response.data.user) {
-        await SecureStorage.setItemAsync('user', JSON.stringify(response.data.user));
-        await SecureStorage.setItemAsync('needsProfileSetup', 'false');
+        await storage.setItemAsync('user', JSON.stringify(response.data.user));
+        await storage.setItemAsync('needsProfileSetup', 'false');
       } else if (response.data.needsProfileSetup) {
-        await SecureStorage.setItemAsync('needsProfileSetup', 'true');
+        await storage.setItemAsync('needsProfileSetup', 'true');
       } else {
-        await SecureStorage.deleteItemAsync('user');
-        await SecureStorage.deleteItemAsync('needsProfileSetup');
+        await storage.deleteItemAsync('user');
+        await storage.deleteItemAsync('needsProfileSetup');
       }
 
       return response.data;
-    } catch (error) {
-      console.error('Auth check error:', error.response?.data || error.message);
-      return {
-        isAuthenticated: false,
-        error: error.response?.data?.error || 'Ошибка проверки аутентификации',
-      };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Auth check error:', error.message);
+        return {
+          isAuthenticated: false,
+          error: error.message,
+        };
+      } else {
+        console.error('Auth check error:', error);
+        return {
+          isAuthenticated: false,
+          error: 'Ошибка проверки аутентификации',
+        };
+      }
     }
   },
 
@@ -254,43 +283,59 @@ const AuthService = {
     try {
       await api.post('/api/auth/logout');
 
-      await SecureStorage.deleteItemAsync('user');
-      await SecureStorage.deleteItemAsync('authToken');
-      await SecureStorage.deleteItemAsync('needsProfileSetup');
-      await SecureStorage.deleteItemAsync('chatId');
+      await storage.deleteItemAsync('user');
+      await storage.deleteItemAsync('authToken');
+      await storage.deleteItemAsync('needsProfileSetup');
+      await storage.deleteItemAsync('chatId');
 
       return { success: true };
-    } catch (error) {
-      console.error('Logout error:', error.response?.data || error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Logout error:', error.message);
+      } else {
+        console.error('Logout error:', error);
+      }
 
-      await SecureStorage.deleteItemAsync('user');
-      await SecureStorage.deleteItemAsync('authToken');
-      await SecureStorage.deleteItemAsync('needsProfileSetup');
-      await SecureStorage.deleteItemAsync('chatId');
+      await storage.deleteItemAsync('user');
+      await storage.deleteItemAsync('authToken');
+      await storage.deleteItemAsync('needsProfileSetup');
+      await storage.deleteItemAsync('chatId');
 
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Logout failed due to unknown error');
+      }
     }
   },
 
   getCurrentUser: async (): Promise<User | null> => {
     try {
-      const userString = await SecureStorage.getItemAsync('user');
+      const userString = await storage.getItemAsync('user');
       if (userString) {
         return JSON.parse(userString);
       }
       return null;
-    } catch (error) {
-      console.error('Ошибка при получении пользователя из хранилища:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Ошибка при получении пользователя из хранилища:', error.message);
+      } else {
+        console.error('Ошибка при получении пользователя из хранилища:', error);
+      }
       return null;
     }
   },
 
   needsProfileSetup: async (): Promise<boolean> => {
     try {
-      const needsSetup = await SecureStorage.getItemAsync('needsProfileSetup');
+      const needsSetup = await storage.getItemAsync('needsProfileSetup');
       return needsSetup === 'true';
-    } catch (error) {
-      console.error('Ошибка при проверке настройки профиля:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Ошибка при проверке настройки профиля:', error.message);
+      } else {
+        console.error('Ошибка при проверке настройки профиля:', error);
+      }
       return false;
     }
   },

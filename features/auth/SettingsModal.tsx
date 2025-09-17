@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TextC from '@ui/TextC';
-import * as SecureStorage from 'expo-secure-store';
+import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { Alert, View } from 'react-native';
 import { Button, Modal, Portal, Switch, TextInput } from 'react-native-paper';
@@ -28,7 +28,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onDismiss }) => 
       const storedDebugMode = await AsyncStorage.getItem('debugMode');
 
       setApiUrl(storedApiUrl || 'https://k-connect.ru');
-      setApiKey(storedApiKey || 'liquide-v2');
+      setApiKey(storedApiKey || 'liquide-gg-v2');
       setDebugMode(storedDebugMode === 'true');
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -59,11 +59,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onDismiss }) => 
           style: 'destructive',
           onPress: async () => {
             try {
-              await SecureStorage.deleteItemAsync('user');
-              await SecureStorage.deleteItemAsync('authToken');
-              await SecureStorage.deleteItemAsync('sessionKey');
-              await SecureStorage.deleteItemAsync('needsProfileSetup');
-              await SecureStorage.deleteItemAsync('chatId');
+              await SecureStore.deleteItemAsync('user');
+              await SecureStore.deleteItemAsync('authToken');
+              await SecureStore.deleteItemAsync('sessionKey');
+              await SecureStore.deleteItemAsync('needsProfileSetup');
+              await SecureStore.deleteItemAsync('chatId');
               await AsyncStorage.clear();
               Alert.alert('Success', 'Storage cleared successfully');
               onDismiss();

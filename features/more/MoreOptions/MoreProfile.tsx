@@ -9,6 +9,7 @@ import { InteractionManager, Pressable, View } from "react-native";
 import { Icon } from "react-native-paper";
 import useAuthStore from "stores/useAuthStore";
 import { formatBalance } from "utils/formatter";
+import { buildImageUrl } from "utils/urlUtils";
 import Option from "./components/Option";
 
 const MoreProfile = () => {
@@ -40,7 +41,7 @@ const MoreProfile = () => {
       borderWidth: 5,
      }}
      source={{
-      uri: `https://k-connect.ru${data?.user.avatar_url}`,
+      uri: buildImageUrl(data?.user.avatar_url),
      }}
     />
    </Flex>

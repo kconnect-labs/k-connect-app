@@ -1,7 +1,8 @@
-import { View, Image } from "react-native";
 import { Flex } from "@ui/Flex";
-import { Root } from "types/profile";
 import React from "react";
+import { Image, View } from "react-native";
+import { Root } from "types/profile";
+import { buildImageUrl } from "utils/urlUtils";
 
 const ProfilePhotos = React.memo(({ data }: { data: Root | null }) => {
  return (
@@ -9,7 +10,7 @@ const ProfilePhotos = React.memo(({ data }: { data: Root | null }) => {
    <Flex className="w-full">
     <Image
      source={{
-      uri: `https://k-connect.ru${data?.user?.banner_url}`,
+      uri: buildImageUrl(data?.user?.banner_url),
       cache: "force-cache",
      }}
      style={{ height: 120, width: "100%" }}
@@ -19,7 +20,7 @@ const ProfilePhotos = React.memo(({ data }: { data: Root | null }) => {
    <Flex className="mt-[-50px] ml-3 relative">
     <Image
      source={{
-      uri: `https://k-connect.ru${data?.user?.avatar_url}`,
+      uri: buildImageUrl(data?.user?.avatar_url),
       cache: "force-cache",
      }}
      className="rounded-full "

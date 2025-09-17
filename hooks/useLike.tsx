@@ -17,7 +17,7 @@ export const useLike = () => {
     {
      method: "POST",
      headers: {
-      "X-API-Key": "liquide-v2",
+      "X-API-Key": "liquide-gg-v2",
      },
     }
    );

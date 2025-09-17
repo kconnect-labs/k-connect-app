@@ -2,16 +2,170 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global design tokens */
+/* CSS переменные для системы тем */
 :root {
-  --color-primary: #6366f1;
-  --color-secondary: #1e1e2e;
-  --color-accent: #b0b0b0;
-  --color-error: #ff6b6b;
-  --color-background: #0f0f23;
-  --color-surface: #1a1a2e;
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #b0b0b0;
+  /* Дефолтные значения */
+  --theme-background: rgba(15, 15, 15, 1);
+  --theme-backdrop-filter: none;
+  --theme-type: default;
+  --theme-site-background: #0a0a0a;
+  --theme-background-full: rgba(15, 15, 15, 1);
+  --theme-button-main: #D0BCFF;
+  --theme-main-color: #d0bcff;
+  /* Цвета текста */
+  --theme-text-primary: rgba(255, 255, 255, 1);
+  --theme-text-secondary: rgb(212, 212, 212);
+  --theme-text-disabled: rgba(255, 255, 255, 1);
+  --theme-text-accent: #D0BCFF;
+  --theme-text-error: #f44336;
+  --theme-text-success: #4caf50;
+  --theme-text-warning: #ff9800;
+  --theme-text-info: #2196f3;
+  --main-border-radius: 18px;
+  --small-border-radius: 14px;
+  --large-border-radius: 22px;
+
+  /* Цветовая схема браузера */
+  color-scheme: dark;
+  accent-color: #D0BCFF;
+}
+
+/* Принудительные значения для тем */
+[data-theme="default"] {
+  --theme-background: rgba(15, 15, 15, 1);
+  --theme-backdrop-filter: none;
+  --theme-site-background: #0a0a0a;
+  --theme-background-full: rgba(15, 15, 15, 1);
+  --theme-button-main: #D0BCFF;
+  --theme-main-color: #d0bcff;
+  --theme-text-primary: rgba(255, 255, 255, 1);
+  --theme-text-secondary: rgb(212, 212, 212);
+  --theme-text-disabled: rgba(255, 255, 255, 1);
+  --theme-text-accent: #D0BCFF;
+  --theme-text-error: #f44336;
+  --theme-text-success: #4caf50;
+  --theme-text-warning: #ff9800;
+  --theme-text-info: #2196f3;
+  --main-border-radius: 18px;
+  --small-border-radius: 14px;
+  --large-border-radius: 22px;
+}
+
+[data-theme="amoled"] {
+  --theme-background: rgba(0, 0, 0, 1);
+  --theme-backdrop-filter: none;
+  --theme-site-background: #000000;
+  --theme-background-full: rgba(0, 0, 0, 1);
+  --theme-button-main: #D0BCFF;
+  --theme-main-color: #d0bcff;
+  --theme-text-primary: rgba(255, 255, 255, 1);
+  --theme-text-secondary: rgb(212, 212, 212);
+  --theme-text-disabled: rgba(255, 255, 255, 1);
+  --theme-text-accent: #D0BCFF;
+  --theme-text-error: #f44336;
+  --theme-text-success: #4caf50;
+  --theme-text-warning: #ff9800;
+  --theme-text-info: #2196f3;
+  --main-border-radius: 24px;
+  --small-border-radius: 14px;
+  --large-border-radius: 22px;
+}
+
+[data-theme="blur"] {
+  --theme-background: rgba(255, 255, 255, 0.03);
+  --theme-backdrop-filter: blur(20px);
+  --theme-site-background: #0a0a0a;
+  --theme-background-full: rgba(15, 15, 15, 1);
+  --theme-button-main: #D0BCFF;
+  --theme-main-color: #d0bcff;
+  --theme-text-primary: rgba(255, 255, 255, 1);
+  --theme-text-secondary: rgb(212, 212, 212);
+  --theme-text-disabled: rgba(255, 255, 255, 1);
+  --theme-text-accent: #D0BCFF;
+  --theme-text-error: #f44336;
+  --theme-text-success: #4caf50;
+  --theme-text-warning: #ff9800;
+  --theme-text-info: #2196f3;
+}
+
+[data-theme="midnight"] {
+  --theme-background: rgba(5, 8, 20, 1);
+  --theme-backdrop-filter: none;
+  --theme-site-background: #030510;
+  --theme-background-full: rgba(5, 8, 20, 1);
+  --theme-button-main: #D0BCFF;
+  --theme-main-color: #d0bcff;
+  --theme-text-primary: rgba(255, 255, 255, 1);
+  --theme-text-secondary: rgb(212, 212, 212);
+  --theme-text-disabled: rgba(255, 255, 255, 1);
+  --theme-text-accent: #B69DF8;
+  --theme-text-error: #f44336;
+  --theme-text-success: #4caf50;
+  --theme-text-warning: #ff9800;
+  --theme-text-info: #2196f3;
+  --main-border-radius: 18px;
+  --small-border-radius: 14px;
+  --large-border-radius: 22px;
+}
+
+[data-theme="neon"] {
+  --theme-background: rgba(8, 20, 45, 1);
+  --theme-backdrop-filter: none;
+  --theme-site-background: #051025;
+  --theme-background-full: rgba(8, 20, 45, 1);
+  --theme-button-main: #D0BCFF;
+  --theme-main-color: #d0bcff;
+  --theme-text-primary: rgba(255, 255, 255, 1);
+  --theme-text-secondary: rgb(212, 212, 212);
+  --theme-text-disabled: rgba(255, 255, 255, 1);
+  --theme-text-accent: #64B5F6;
+  --theme-text-error: #f44336;
+  --theme-text-success: #4caf50;
+  --theme-text-warning: #ff9800;
+  --theme-text-info: #2196f3;
+  --main-border-radius: 18px;
+  --small-border-radius: 14px;
+  --large-border-radius: 22px;
+}
+
+[data-theme="vintage"] {
+  --theme-background: rgba(35, 20, 8, 1);
+  --theme-backdrop-filter: none;
+  --theme-site-background: #221205;
+  --theme-background-full: rgba(35, 20, 8, 1);
+  --theme-button-main: #D0BCFF;
+  --theme-main-color: #d0bcff;
+  --theme-text-primary: rgba(255, 255, 255, 1);
+  --theme-text-secondary: rgba(255, 255, 255, 1);
+  --theme-text-disabled: rgba(255, 255, 255, 1);
+  --theme-text-accent: #D7CCC8;
+  --theme-text-error: #f44336;
+  --theme-text-success: #4caf50;
+  --theme-text-warning: #ff9800;
+  --theme-text-info: #2196f3;
+  --main-border-radius: 18px;
+  --small-border-radius: 14px;
+  --large-border-radius: 22px;
+}
+
+[data-theme="pickme"] {
+  --theme-background: rgba(131, 61, 96, 1);
+  --theme-backdrop-filter: none;
+  --theme-site-background: #b6668a;
+  --theme-background-full: rgba(131, 61, 96, 1);
+  --theme-button-main: #D0BCFF;
+  --theme-main-color: #d0bcff;
+  --theme-text-primary: rgba(255, 255, 255, 1);
+  --theme-text-secondary: rgb(212, 212, 212);
+  --theme-text-disabled: rgba(255, 255, 255, 1);
+  --theme-text-accent: #F8BBD9;
+  --theme-text-error: #f44336;
+  --theme-text-success: #4caf50;
+  --theme-text-warning: #ff9800;
+  --theme-text-info: #2196f3;
+  --main-border-radius: 18px;
+  --small-border-radius: 14px;
+  --large-border-radius: 22px;
 }
 
 /* Base styles for better design */
@@ -19,18 +173,358 @@
   * {
     font-family: 'SFProDisplay-Regular', ui-sans-serif, system-ui;
   }
+
+  body {
+    background: var(--theme-site-background);
+    color: var(--theme-text-primary);
+    transition: background 0.3s ease, color 0.3s ease;
+  }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-text-primary rounded-xl px-4 py-3 font-semibold shadow-lg;
+    background: var(--theme-button-main);
+    color: var(--theme-text-primary);
+    border-radius: var(--main-border-radius);
+    padding: 12px 16px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
   }
 
   .input-field {
-    @apply bg-secondary border border-accent rounded-2xl px-4 py-4 text-text-primary placeholder-accent;
+    background: var(--theme-background);
+    backdrop-filter: var(--theme-backdrop-filter);
+    -webkit-backdrop-filter: var(--theme-backdrop-filter);
+    border: 1px solid rgba(66, 66, 66, 0.5);
+    border-radius: var(--main-border-radius);
+    padding: 16px 20px;
+    color: var(--theme-text-primary);
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .input-field:focus {
+    border-color: var(--theme-main-color);
+    box-shadow: 0 0 0 2px rgba(208, 188, 255, 0.2);
+  }
+
+  .theme-card {
+    background: var(--theme-background);
+    backdrop-filter: var(--theme-backdrop-filter);
+    -webkit-backdrop-filter: var(--theme-backdrop-filter);
+    border-radius: var(--main-border-radius);
+    border: 1px solid rgba(66, 66, 66, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    background: linear-gradient(135deg, var(--theme-background) 0%, var(--theme-background-full) 100%);
   }
+
+  /* Utility classes for text colors */
+  .text-theme-primary { color: var(--theme-text-primary); }
+  .text-theme-secondary { color: var(--theme-text-secondary); }
+  .text-theme-accent { color: var(--theme-text-accent); }
+  .text-theme-error { color: var(--theme-text-error); }
+  .text-theme-success { color: var(--theme-text-success); }
+  .text-theme-warning { color: var(--theme-text-warning); }
+  .text-theme-info { color: var(--theme-text-info); }
+
+  /* Theme-aware backgrounds */
+  .theme-bg { background: var(--theme-background); }
+  .theme-bg-full { background: var(--theme-background-full); }
+  .theme-site-bg { background: var(--theme-site-background); }
+}
+
+/* Анимации для плавного перехода между темами */
+@keyframes themeTransition {
+  from {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.theme-transition {
+  animation: themeTransition 0.3s ease-out;
+}
+
+/* Стили для браузерных элементов */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--theme-site-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-main-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-text-accent);
+}
+
+/* Стили для выделения текста */
+::selection {
+  background-color: var(--theme-main-color);
+  color: var(--theme-background);
+}
+
+::-moz-selection {
+  background-color: var(--theme-main-color);
+  color: var(--theme-background);
+}
+
+/* Стили для фокуса элементов */
+:focus-visible {
+  outline: 2px solid var(--theme-main-color);
+  outline-offset: 2px;
+}
+
+/* Класс для элементов, которые должны реагировать на изменение темы */
+.theme-aware {
+  background: var(--theme-background) !important;
+  backdrop-filter: var(--theme-backdrop-filter) !important;
+  -webkit-backdrop-filter: var(--theme-backdrop-filter) !important;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* Класс для фона сайта */
+.theme-site-background {
+  background: var(--theme-site-background);
+  transition: background 0.3s ease;
+}
+
+/* Класс для body и html */
+body.theme-site-background,
+html.theme-site-background {
+  background: var(--theme-site-background);
+  transition: background 0.3s ease;
+}
+
+/* Утилитарные классы для быстрого применения тем */
+.theme-default {
+  background: rgba(15, 15, 15, 0.98) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-blur {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.theme-light {
+  background: rgba(255, 255, 255, 1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-midnight {
+  background: rgba(5, 8, 20, 1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-ocean {
+  background: rgba(8, 25, 40, 1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-sunset {
+  background: rgba(40, 15, 8, 1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-forest {
+  background: rgba(8, 30, 15, 1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-aurora {
+  background: rgba(12, 35, 25, 1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-cosmic {
+  background: rgba(30, 8, 35, 1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-neon {
+  background: rgba(8, 20, 45, 1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-vintage {
+  background: rgba(35, 20, 8, 1) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.theme-pickme {
+  background: rgba(131, 61, 96, 1) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* Утилитарные классы для цветов текста */
+.text-primary {
+  color: var(--theme-text-primary) !important;
+}
+
+.text-secondary {
+  color: var(--theme-text-secondary) !important;
+}
+
+.text-disabled {
+  color: var(--theme-text-disabled) !important;
+}
+
+.text-accent {
+  color: var(--theme-text-accent) !important;
+}
+
+.text-error {
+  color: var(--theme-text-error) !important;
+}
+
+.text-success {
+  color: var(--theme-text-success) !important;
+}
+
+.text-warning {
+  color: var(--theme-text-warning) !important;
+}
+
+.text-info {
+  color: var(--theme-text-info) !important;
+}
+
+/* Модификаторы для разных состояний */
+.theme-aware:hover {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+}
+
+.theme-aware:focus {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+}
+
+/* Специальные классы для модальных окон */
+.theme-modal {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+}
+
+.theme-menu {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+}
+
+/* Классы для карточек */
+.theme-card {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  border-radius: var(--main-border-radius);
+  border: 1px solid rgba(66, 66, 66, 0.5);
+}
+
+/* Классы для кнопок */
+.theme-button {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  border: 1px solid rgba(66, 66, 66, 0.5);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.theme-button:hover {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Классы для сайдбара */
+.theme-sidebar {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  border-right: 1px solid rgba(66, 66, 66, 0.5);
+}
+
+/* Классы для хедера */
+.theme-header {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  border-bottom: 1px solid rgba(66, 66, 66, 0.5);
+}
+
+/* Классы для форм */
+.theme-form {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  border: 1px solid rgba(66, 66, 66, 0.5);
+}
+
+/* Классы для списков */
+.theme-list {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+}
+
+.theme-list-item {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.theme-list-item:hover {
+  background: var(--theme-background);
+  backdrop-filter: var(--theme-backdrop-filter);
+  border-bottom: 1px solid rgba(66, 66, 66, 0.5);
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 768px) {
+  .theme-modal {
+    border-radius: 0;
+    margin: 0;
+    max-width: 100vw;
+    max-height: 100vh;
+  }
+
+  .theme-card {
+    border-radius: 8px;
+  }
+}
+
+/* Стили для форм и элементов управления */
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] {
+  accent-color: var(--theme-main-color);
 }

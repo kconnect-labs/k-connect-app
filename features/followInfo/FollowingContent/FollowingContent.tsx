@@ -5,6 +5,7 @@ import TextC from "@ui/TextC";
 import { useState } from "react";
 import { FlatList, RefreshControl } from "react-native-gesture-handler";
 import { Icon } from "react-native-paper";
+import { buildImageUrl } from "utils/urlUtils";
 
 export default function FollowingContent() {
  const { data, refetch } = useFollowing();
@@ -39,7 +40,7 @@ export default function FollowingContent() {
         userId={friend.id}
         size={18}
         image={{
-         uri: `https://k-connect.ru${friend.avatar_url}`,
+         uri: buildImageUrl(friend.avatar_url),
         }}
        />
        <Flex direction="column">

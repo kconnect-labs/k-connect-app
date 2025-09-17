@@ -3,7 +3,8 @@ import { Flex } from "@ui/Flex";
 import { StyleSheet, View } from "react-native";
 import { Badge, Icon } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useAuthStore from "src/stores/useAuthStore";
+import useAuthStore from "stores/useAuthStore";
+import { buildImageUrl } from "utils/urlUtils";
 
 const TopBar = () => {
  const { user } = useAuthStore();
@@ -24,7 +25,7 @@ const TopBar = () => {
      <Avatar
       userId={user.id}
       className="rounded-full"
-      image={{ uri: `https://k-connect.ru${user.avatar_url}` }}
+      image={{ uri: buildImageUrl(user.avatar_url) }}
      />
     </Flex>
    </View>

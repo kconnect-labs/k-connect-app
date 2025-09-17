@@ -1,6 +1,5 @@
 import { Flex } from "@ui/Flex";
 import TextC from "@ui/TextC";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
@@ -89,12 +88,7 @@ const RegisterContent = () => {
  const togglePasswordVisibility = () => setPasswordVisible((prev) => !prev);
 
  return (
-  <LinearGradient
-   colors={["#0f0f23", "#1a1a2e", "#16213e"]}
-   start={{ x: 0, y: 0 }}
-   end={{ x: 1, y: 1 }}
-   style={{ flex: 1 }}
-  >
+  <View className="flex-1 theme-bg">
    <KeyboardAvoidingView
     behavior={Platform.OS === "ios" ? "padding" : "height"}
     style={{ flex: 1 }}
@@ -104,10 +98,10 @@ const RegisterContent = () => {
       <Flex direction="column" align="center" gap={25} className="w-full">
        <Logo />
        <View className="w-full text-center">
-        <TextC size={32} className="w-full text-center font-bold text-text-primary">
+        <TextC size={32} className="w-full text-center font-bold text-theme-primary">
          Создать аккаунт
         </TextC>
-        <TextC size={16} className="w-full text-center mt-3 font-medium text-text-secondary">
+        <TextC size={16} className="w-full text-center mt-3 font-medium text-theme-secondary">
          Присоединяйтесь к K-Коннект
         </TextC>
        </View>
@@ -116,13 +110,13 @@ const RegisterContent = () => {
       <Flex direction="column" gap={25} className="w-full">
        <View className="relative">
         <View style={{ position: "absolute", left: 15, top: "50%", transform: [{ translateY: -10 }] }}>
-         <Icon source="account" size={22} color="#b0b0b0" />
+         <Icon source="account" size={22} color="var(--theme-text-secondary)" />
         </View>
         <TextInput
          value={username}
          onChangeText={(text) => setUsername(text)}
          placeholder="Имя пользователя"
-         placeholderTextColor="#b0b0b0"
+         placeholderTextColor="var(--theme-text-secondary)"
          className="input-field w-full pl-12 pr-4 py-5 text-lg font-medium"
          style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 6, elevation: 5 }}
         />
@@ -131,13 +125,13 @@ const RegisterContent = () => {
 
        <View className="relative">
         <View style={{ position: "absolute", left: 15, top: "50%", transform: [{ translateY: -10 }] }}>
-         <Icon source="email" size={22} color="#b0b0b0" />
+         <Icon source="email" size={22} color="var(--theme-text-secondary)" />
         </View>
         <TextInput
          value={email}
          onChangeText={(text) => setEmail(text)}
          placeholder="Email"
-         placeholderTextColor="#b0b0b0"
+         placeholderTextColor="var(--theme-text-secondary)"
          keyboardType="email-address"
          autoCapitalize="none"
          className="input-field w-full pl-12 pr-4 py-5 text-lg font-medium"
@@ -224,7 +218,7 @@ const RegisterContent = () => {
      </Flex>
     </ScrollView>
    </KeyboardAvoidingView>
-  </LinearGradient>
+  </View>
  );
 };
 

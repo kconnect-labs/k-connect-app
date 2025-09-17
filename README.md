@@ -46,7 +46,13 @@ gh repo clone kiwinatra/nui-kk-pack
 
 4. 
 ```bash
-npm i
-expo start
+npm install --legacy-peer-deps
+npm install @react-native-async-storage/async-storage@2.1.2 expo@53.0.22 expo-clipboard@~7.1.5 expo-constants@~17.1.7 expo-font@~13.3.2 expo-image@~2.4.0 expo-linking@~7.1.7 expo-router@~5.1.6 expo-secure-store@~14.2.4 expo-splash-screen@~0.30.10 expo-system-ui@~5.0.11 expo-web-browser@~14.2.0 lottie-react-native@7.2.2 react-native@0.79.5 react-native-pager-view@6.7.1 react-native-svg@15.11.2 --legacy-peer-deps
+expo start web --clear
 ```
+
+##Если будут ошибки - 
+
+> 1) Удалите node_modules и .expo
+> 2) переустановите nuitka
 

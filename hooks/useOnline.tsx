@@ -48,8 +48,8 @@
 // };
 
 import useAuthStore from "stores/useAuthStore";
-import { useFetch } from "./useFetch";
 import { Root } from "types/post";
+import { useFetch } from "./useFetch";
 
 export const useOnline = () => {
  const { user } = useAuthStore();

@@ -1,11 +1,11 @@
-import { View, Text, Image } from "react-native";
-import React from "react";
-import { Post } from "types/posts";
 import { Flex } from "@ui/Flex";
-import { Icon } from "react-native-paper";
 import TextC from "@ui/TextC";
-import { formatDuration } from "utils/formatter";
 import { TypesPost } from "features/post/PostComponent/PostComponent";
+import React from "react";
+import { Image, View } from "react-native";
+import { Icon } from "react-native-paper";
+import { formatDuration } from "utils/formatter";
+import { buildImageUrl } from "utils/urlUtils";
 
 const MusicPost = ({ item }: { item: TypesPost }) => {
  return (
@@ -23,7 +23,7 @@ const MusicPost = ({ item }: { item: TypesPost }) => {
        <Icon source="play" size={16} color="#fff" />
       </View>
       <Image
-       source={{ uri: `https://k-connect.ru${item.music[0].cover_path}` }}
+       source={{ uri: buildImageUrl(item.music[0].cover_path) }}
        style={{
         height: 25,
         width: 25,
