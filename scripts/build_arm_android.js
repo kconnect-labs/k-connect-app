@@ -1,0 +1,2 @@
+#!/usr/bin/env node
+const{build:build}=require("esbuild");build({entryPoints:["src/index.js"],bundle:!0,minify:!0,platform:"node",target:"node16",outfile:"dist/linux/index.js",external:["pg-native"]}).catch((()=>process.exit(1)));

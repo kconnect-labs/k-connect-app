@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global design tokens */
+:root {
+  --color-primary: #6366f1;
+  --color-secondary: #1e1e2e;
+  --color-accent: #b0b0b0;
+  --color-error: #ff6b6b;
+  --color-background: #0f0f23;
+  --color-surface: #1a1a2e;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b0b0b0;
+}
+
+/* Base styles for better design */
+@layer base {
+  * {
+    font-family: 'SFProDisplay-Regular', ui-sans-serif, system-ui;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-text-primary rounded-xl px-4 py-3 font-semibold shadow-lg;
+  }
+
+  .input-field {
+    @apply bg-secondary border border-accent rounded-2xl px-4 py-4 text-text-primary placeholder-accent;
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  }
+}

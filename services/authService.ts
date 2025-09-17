@@ -2,7 +2,7 @@ import * as SecureStorage from 'expo-secure-store';
 import api from './api';
 
 interface User {
-  // Define user properties here
+  
 }
 
 interface LoginResponse {
@@ -17,6 +17,7 @@ interface LoginResponse {
 interface RegisterResponse {
   success: boolean;
   error?: string;
+  message?: string;
 }
 
 interface ProfileSetupResponse {
@@ -53,7 +54,7 @@ const AuthService = {
           password,
         },
         {
-          headers: { 'X-Mobile-Client': '1' },
+          headers: { 'X-Mobile-Client': '1', 'X-API-Key': 'liquide-v2' },
         }
       );
 
@@ -93,7 +94,7 @@ const AuthService = {
               // если всё же ещё нет sessionKey, попробуем получить старым способом
               try {
                 const skRes = await api.get('/apiMes/auth/get-session-key', {
-                  headers: { 'Cache-Control': 'no-cache', Authorization: `Bearer ${authTokenToStore}` },
+                  headers: { 'Cache-Control': 'no-cache', Authorization: `Bearer ${authTokenToStore}` },  
                 });
                 if (skRes.data?.session_key) {
                   await SecureStorage.setItemAsync('sessionKey', skRes.data.session_key);
@@ -138,24 +139,50 @@ const AuthService = {
     }
   },
 
+
+
   register: async (username: string, email: string, password: string): Promise<RegisterResponse> => {
     try {
       const response = await api.post<RegisterResponse>('/api/auth/register', {
         username,
         email,
         password,
+      }, {
+        headers: {
+          'X-API-Key': 'liquide-v2'
+        }
       });
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Register error:', error.response?.data || error.message);
-      throw error;
+
+      let errorMessage = 'Registration failed';
+
+      if (!error.response) {
+        // Network error
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (error.response.status >= 500) {
+        // Server error
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.response.status === 429) {
+        // Rate limit
+        errorMessage = error.response.data?.error || 'Too many registration attempts. Please try again later.';
+      } else if (error.response.status >= 400) {
+        // Client error (validation, etc.)
+        errorMessage = error.response.data?.error || 'Invalid input. Please check your details and try again.';
+      } else {
+        // Other errors
+        errorMessage = error.message || 'An unexpected error occurred.';
+      }
+
+      throw new Error(errorMessage);
     }
   },
 
   setupProfile: async (profileData: ProfileData): Promise<ProfileSetupResponse> => {
     try {
-      const chatId = await SecureStorage.getItemAsyncAsync('chatId');
+      const chatId = await SecureStorage.getItemAsync('chatId');
       if (chatId) {
         profileData.chat_id = chatId;
       }

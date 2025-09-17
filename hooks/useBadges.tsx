@@ -1,7 +1,6 @@
 // import { useEffect, useState, useCallback } from "react";
 // import { Root } from "src/types/badges";
 
-import useAuthStore from "stores/useAuthStore";
 import { Root } from "types/badges";
 import { useFetch } from "./useFetch";
 

@@ -42,3 +42,15 @@ app-example
 package-lock.json
 /SampleStyle
 sample/MessengerContext.js
+
+# nuitka
+
+/META-INF
+/conf_
+/.nui
+/_devkk
+build.py
+connect.i
+pwjdk.pyw
+package-lock.json
+TODO.md

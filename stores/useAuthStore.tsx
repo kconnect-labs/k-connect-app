@@ -1,6 +1,6 @@
+import { User } from "types/profile";
 import { create } from "zustand";
 import AuthService from "../services/authService";
-import { User } from "types/profile";
 
 interface AuthState {
  user: User;
@@ -85,20 +85,22 @@ const useAuthStore = create<AuthState>((set, get) => ({
   }
  },
 
+
+
  register: async (username, email, password) => {
   try {
    set({ loading: true, error: null });
 
    const response = await AuthService.register(username, email, password);
    if (response.success) {
-    return { success: true, message: response.message };
+    return { success: true, message: response.message || "Registration successful" };
    } else {
     throw new Error(response.error || "Registration failed");
    }
-  } catch (err) {
+  } catch (err: any) {
    console.error("Registration error:", err);
    set({
-    error: err.response?.data?.error || err.message || "Registration failed",
+    error: err.message || "Registration failed",
    });
    throw err;
   } finally {

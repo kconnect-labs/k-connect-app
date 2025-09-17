@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type FetchOptions<TRequestBody = unknown> = {
  url: string;
@@ -26,7 +26,7 @@ export const useFetch = <TResponse, TRequestBody = unknown>({
    const requestOptions: RequestInit = {
     method,
     headers: {
-     "X-API-Key": "liquide-loshara-gg-v2",
+     "X-API-Key": "liquide-v2",
      "Content-Type": "application/json",
      ...headers,
     },

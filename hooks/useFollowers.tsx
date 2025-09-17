@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useAuthStore from "stores/useAuthStore";
 import { Root } from "types/followers";
 
@@ -17,7 +17,7 @@ export const useFollowers = () => {
     {
      method: "GET",
      headers: {
-      "X-API-Key": "liquide-loshara-gg-v2",
+      "X-API-Key": "liquide-v2",
      },
     }
    );

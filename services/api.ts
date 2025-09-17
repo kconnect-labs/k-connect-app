@@ -11,7 +11,7 @@ const api: AxiosInstance = axios.create({
  baseURL: "https://k-connect.ru",
  timeout: 30000, // Увеличиваем timeout до 30 секунд
  headers: {
-  "X-API-Key": "liquide-loshara-gg-v2",
+  "X-API-Key": "liquide-v2",
   "Content-Type": "application/json",
  },
 });

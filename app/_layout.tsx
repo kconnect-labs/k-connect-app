@@ -2,12 +2,20 @@ import { PortalProvider } from "@gorhom/portal";
 import { ModalWrapper } from "components/ModalWrapper";
 import NotifyButton from "components/NotifyButton";
 import { MessengerProvider } from "contexts/MessengerContext";
+import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider as PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { customFonts } from "../assets/fonts/fonts";
 
 export default function RootLayout() {
+ const [fontsLoaded] = useFonts(customFonts);
+
+ if (!fontsLoaded) {
+  return null;
+ }
+
  return (
   <GestureHandlerRootView style={{ flex: 1 }}>
    <SafeAreaProvider>
