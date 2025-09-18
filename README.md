@@ -103,6 +103,13 @@ expo start web --clear
    pip install nuitka
    ```
 
+`ВАЖНО! Если у вас не установлен python, удаляйте .nui и запускайте:
+
+```bash
+expo start -- --clearcache
+```
+`
+
 3. **Проверьте версию Node.js:**
    ```
    node --version
